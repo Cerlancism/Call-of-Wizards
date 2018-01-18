@@ -1,0 +1,31 @@
+Done by:
+
+Chen Yu p1626063
+Kenze Wee Hon-Ming p1625905
+Lim Ding Wen p1626469
+
+Models:
+
+Scripts:
+
+Particle effects:
+
+Music and sound:
+
+Textures:
+
+3D Scanned Roughed Up Snow - 2x2 meters licensed by Wojtek Starak
+Avaliable on https://www.textures.com/download/3dscans0087/128331?q=snow
+(Creative Commons CC)
+3D Scanned Plain Snow - 3x3 meters licensed by Wojtek Starak
+Avaliable on https://www.textures.com/download/3dscans0089/128337?q=snow
+(Creative Commons CC)
+3D Scanned Dirty Snow - 4x4 meters licensed by Wojtek Starak
+Avaliable on https://www.textures.com/download/3dscans0102/128413?q=snow
+(Creative Commons CC)
+
+Sprites:
+
+Crosshair Pack licensed by para
+Avaliable on https://opengameart.org/content/64-crosshairs-pack
+(Public Domain)
