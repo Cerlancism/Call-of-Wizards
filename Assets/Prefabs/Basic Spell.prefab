@@ -39,7 +39,7 @@ GameObject:
   - component: {fileID: 114475312376012888}
   - component: {fileID: 135959788337291398}
   - component: {fileID: 54286571694886542}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Basic Spell
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -197,7 +197,7 @@ MonoBehaviour:
   direction: {x: 0, y: 0, z: 0}
   shooter: {fileID: 0}
   speed: 30
-  damage: 20
+  damage: 10
   despawnTime: 10
 --- !u!135 &135959788337291398
 SphereCollider:

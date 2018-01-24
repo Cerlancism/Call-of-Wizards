@@ -3,5 +3,5 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public interface IHurtable {
-    void Hurt(float amount);
+    void Hurt(float amount, bool createsMana = false);
 }

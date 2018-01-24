@@ -38,7 +38,7 @@ public class Spell
 // Walk Mode - walk (0), run (1), crouch (2)
 // Crouch = sneak
 
-public class Player : MonoBehaviour {
+public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     [Header("Movement")]
     public float walkingSpeed = 5;
     public float runningSpeed = 10;
@@ -95,9 +95,11 @@ public class Player : MonoBehaviour {
     public Spell[] spells;
     public RectTransform spellBar;
     public RectTransform spellBarSpell;
-    public RectTransform spellBarHighlight;
     public float offsetX = 100;
+    public CanvasGroup spellBarCanvasGroup;
+    public float spellBarTimescale = 0.1f;
     private int currentSpell;
+    private bool spellBarActivated;
 
     [Header("Melee")]
     public float meleeCooldown = 0.2f;
@@ -107,15 +109,26 @@ public class Player : MonoBehaviour {
     public TrailRenderer meleeFistTrail;
     public float meleeFistTrailDuration = 0.5f;
     public float meleeDamage = 10;
+    public float meleeDamageDelay = 0.15f;
     private float meleeCooldownTime;
     private float meleeStopDurationTime;
     private float meleeFistTrailDurationTime;
+    private float meleeDamageDelayTime;
+    private bool meleeDamageDelayActivated;
+
+    [Header("Healing")]
+    public float healingCooldown = 2;
+    public float healingManaCost = 30;
+    public float healingHealthAmount = 60;
+    public float healingStopDuration = 2;
+    private float healingStopDurationTime;
+    private float healingCooldownTime;
 
     [Header("Basic Attack")]
     public BasicSpell basicSpell;
     public float basicSpellCooldown = 0.5f;
     public Transform basicSpellEmitPosition;
-    public float basicSpellManaCost = 10;
+    public float basicSpellManaCost = 5;
     private float basicSpellCooldownTime;
 
     [Header("Zoom Crosshair")]
@@ -260,7 +273,7 @@ public class Player : MonoBehaviour {
 
     private void SwitchSpell()
     {
-        if (Input.GetButtonDown("Next Spell"))
+        /*if (Input.GetButtonDown("Next Spell"))
         {
             currentSpell++;
             if (currentSpell >= spells.Length)
@@ -275,21 +288,82 @@ public class Player : MonoBehaviour {
             {
                 currentSpell = spells.Length - 1;
             }
+        }*/
+
+        // Spell bar activation
+        if (Input.GetButton("Switch Spells"))
+        {
+            spellBarActivated = true;
+            Time.timeScale = spellBarTimescale;
+            spellBarCanvasGroup.alpha = 1;
+        }
+        else
+        {
+            spellBarActivated = false;
+            Time.timeScale = 1;
+            spellBarCanvasGroup.alpha = 0;
         }
 
-        // Highlight selected spell
-        spellBarHighlight.anchoredPosition = new Vector2(offsetX * currentSpell, 0);
+        if (spellBarActivated)
+        {
+            // Numbered navigation
+            for (int i = 0; i < spells.Length && i < 10; i++)
+            {
+                if (Input.GetKeyDown((i + 1).ToString()))
+                {
+                    currentSpell = i;
+                }
+            }
+
+            // Scrollwheel navigation
+            currentSpell += (int)Input.GetAxisRaw("Mouse ScrollWheel");
+            if (currentSpell < 0)
+            {
+                currentSpell = 0;
+            }
+            else if (currentSpell >= spells.Length)
+            {
+                currentSpell = spells.Length - 1;
+            }
+
+            // Highlight selected spell
+            spellBar.anchoredPosition = new Vector2(-offsetX * currentSpell, 0);
+        }
     }
 
     private void Attack()
     {
         meleeCooldownTime -= Time.deltaTime;
+        healingCooldownTime -= Time.deltaTime;
         basicSpellCooldownTime -= Time.deltaTime;
 
         meleeFistTrailDurationTime -= Time.deltaTime;
         if (meleeFistTrailDurationTime <= 0)
         {
             meleeFistTrail.enabled = false;
+        }
+
+        if (meleeDamageDelayActivated)
+        {
+            meleeDamageDelayTime -= Time.deltaTime;
+            if (meleeDamageDelayTime <= 0)
+            {
+                // Hurt hurtables
+                Collider[] collidersInAttackArea = Physics.OverlapBox(meleeAttackArea.position, meleeAttackArea.localScale / 2, meleeAttackArea.rotation);
+                foreach (Collider colliderInAttackArea in collidersInAttackArea)
+                {
+                    IHurtable hurtable = colliderInAttackArea.GetComponent<IHurtable>();
+
+                    // If it's hurtable
+                    // Also, don't hurt ourselves
+                    if (hurtable != null && colliderInAttackArea.gameObject != gameObject)
+                    {
+                        hurtable.Hurt(meleeDamage, true);
+                    }
+                }
+
+                meleeDamageDelayActivated = false;
+            }
         }
 
         if (Input.GetButtonDown("Attack"))
@@ -308,18 +382,24 @@ public class Player : MonoBehaviour {
                         meleeFistTrail.enabled = true;
                         meleeFistTrailDurationTime = meleeFistTrailDuration;
 
-                        // Hurt hurtables
-                        Collider[] collidersInAttackArea = Physics.OverlapBox(meleeAttackArea.position, meleeAttackArea.localScale / 2, meleeAttackArea.rotation);
-                        foreach (Collider colliderInAttackArea in collidersInAttackArea)
-                        {
-                            IHurtable hurtable = colliderInAttackArea.GetComponent<IHurtable>();
+                        // Damage after some time
+                        meleeDamageDelayActivated = true;
+                        meleeDamageDelayTime = meleeDamageDelay;
+                    }
+                    break;
 
-                            // If it's hurtable
-                            if (hurtable != null)
-                            {
-                                hurtable.Hurt(meleeDamage);
-                            }
-                        }
+                case "Healing":
+                    if (healingCooldownTime <= 0 && mana > 0)
+                    {
+                        healingCooldownTime = healingCooldown;
+                        healingStopDurationTime = healingStopDuration;
+                        animator.SetTrigger("Healing");
+
+                        // Use up mana
+                        mana -= healingManaCost;
+
+                        // Replenish health
+                        health += healingHealthAmount;
                     }
                     break;
 
@@ -460,7 +540,8 @@ public class Player : MonoBehaviour {
 
         // Check if moving
         meleeStopDurationTime -= Time.deltaTime;
-        if (inputDirection == Vector2.zero || meleeStopDurationTime > 0)
+        healingStopDurationTime -= Time.deltaTime;
+        if (inputDirection == Vector2.zero || meleeStopDurationTime > 0 || healingStopDurationTime > 0)
         {
             animator.SetBool("Walking", false);
             
@@ -500,7 +581,7 @@ public class Player : MonoBehaviour {
 
             // Turn player towards moving direction
             Vector3 direction3d = new Vector3(direction.x, 0, direction.y);
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction3d, Vector3.up), turningSpeed);
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction3d, Vector3.up), turningSpeed * Time.deltaTime);
         }
     }
 
@@ -544,5 +625,25 @@ public class Player : MonoBehaviour {
 
         // Ragdoll
         ragdoll.SetEnabled(true);
+    }
+
+    public void AbsorbMana(float amount)
+    {
+        mana += amount;
+    }
+
+    public bool CanAbsorb()
+    {
+        return mana < maxMana;
+    }
+
+    public void Hurt(float amount, bool createsMana = false)
+    {
+        health -= amount;
+        if (health <= 0)
+        {
+            alive = false;
+            ragdoll.SetEnabled(true);
+        }
     }
 }
