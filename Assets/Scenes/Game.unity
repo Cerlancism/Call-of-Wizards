@@ -2070,7 +2070,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.00017586198, y: 0.105748355, z: -0.0111711705}
+  m_ConnectedAnchor: {x: -0.00017586198, y: 0.105748355, z: -0.011174985}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 0, z: 1}
   m_TwistLimitSpring:
@@ -2528,7 +2528,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.09789337, y: -0.058758423, z: -0.0058382195}
+  m_ConnectedAnchor: {x: -0.09789337, y: -0.058758423, z: -0.005834405}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 0, z: 1}
   m_TwistLimitSpring:
@@ -2744,7 +2744,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.0021896362, y: -0.41696334, z: 0.007014334}
+  m_ConnectedAnchor: {x: 0.0021896362, y: -0.41696334, z: 0.0070105195}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 0, z: 1}
   m_TwistLimitSpring:
@@ -3339,7 +3339,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.00017586198, y: 0.105748355, z: -0.0111711705}
+  m_ConnectedAnchor: {x: -0.00017586198, y: 0.105748355, z: -0.011174985}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 0, z: 1}
   m_TwistLimitSpring:
@@ -3797,7 +3797,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.09789337, y: -0.058758423, z: -0.0058382195}
+  m_ConnectedAnchor: {x: -0.09789337, y: -0.058758423, z: -0.005834405}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 0, z: 1}
   m_TwistLimitSpring:
@@ -4013,7 +4013,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.0021896362, y: -0.41696334, z: 0.007014334}
+  m_ConnectedAnchor: {x: 0.0021896362, y: -0.41696334, z: 0.0070105195}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 0, z: 1}
   m_TwistLimitSpring:
@@ -4122,7 +4122,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.6, y: 1.5}
+  m_AnchoredPosition: {x: 0.5999985, y: 1.5}
   m_SizeDelta: {x: 115.06, y: 62.28}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &227421213
@@ -6337,6 +6337,9 @@ GameObject:
   m_Component:
   - component: {fileID: 495564466}
   - component: {fileID: 495564463}
+  - component: {fileID: 495564465}
+  - component: {fileID: 495564468}
+  - component: {fileID: 495564469}
   - component: {fileID: 495564467}
   - component: {fileID: 495564464}
   m_Layer: 10
@@ -6376,6 +6379,22 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0.985, z: 0}
+--- !u!114 &495564465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 495564462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3cabb2138fa9554a8bc43f341f60b5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initialStamina: 1
+  replenishDelay: 2
+  replenishRate: 0.3
+  fullReplenishDelay: 2
+  fullReplenishRate: 0.3
 --- !u!4 &495564466
 Transform:
   m_ObjectHideFlags: 0
@@ -6415,27 +6434,9 @@ MonoBehaviour:
   characterController: {fileID: 495564464}
   animator: {fileID: 1316902640}
   ragdoll: {fileID: 495564463}
-  initialStamina: 1
-  staminaReplenishDelay: 2
-  staminaReplenishRate: 0.3
-  staminaFullReplenishDelay: 2
-  staminaFullReplenishRate: 0.3
-  staminaRedDeplenishRate: 0.3
-  staminaWheelFadeRate: 2
-  staminaWheelCanvasGroup: {fileID: 1631951718}
-  staminaWheelGreen: {fileID: 309273743}
-  staminaWheelRed: {fileID: 2042811060}
-  staminaWheelYellow: {fileID: 1655001086}
-  initialHealth: 100
-  maxHealth: 100
-  healthBar: {fileID: 1243561089}
-  healthBarLag: {fileID: 609807679}
-  healthLagRate: 20
-  initialMana: 100
-  maxMana: 100
-  manaBar: {fileID: 1869936438}
-  manaBarLag: {fileID: 227421213}
-  manaLagRate: 20
+  stamina: {fileID: 495564465}
+  health: {fileID: 495564468}
+  mana: {fileID: 495564469}
   spells:
   - name: Melee
     displayName: Melee
@@ -6483,6 +6484,32 @@ MonoBehaviour:
   - Melee
   - Healing
   crosshairFallbackDistanceFromCamera: 100
+--- !u!114 &495564468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 495564462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77420e05850a04a4aa4766c15df40e34, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initialHealth: 100
+  maxHealth: 100
+--- !u!114 &495564469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 495564462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddcd695a7a563c44895d65bc14df11fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  initialMana: 100
+  maxMana: 100
 --- !u!1 &601179286
 GameObject:
   m_ObjectHideFlags: 0
@@ -10078,7 +10105,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.00017586198, y: 0.105748355, z: -0.0111711705}
+  m_ConnectedAnchor: {x: -0.00017586198, y: 0.105748355, z: -0.011174985}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 0, z: 1}
   m_TwistLimitSpring:
@@ -10536,7 +10563,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.09789337, y: -0.058758423, z: -0.0058382195}
+  m_ConnectedAnchor: {x: -0.09789337, y: -0.058758423, z: -0.005834405}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 0, z: 1}
   m_TwistLimitSpring:
@@ -10752,7 +10779,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.0021896362, y: -0.41696334, z: 0.007014334}
+  m_ConnectedAnchor: {x: 0.0021896362, y: -0.41696334, z: 0.0070105195}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 0, z: 1}
   m_TwistLimitSpring:
@@ -15000,7 +15027,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.00017586198, y: 0.105748355, z: -0.0111711705}
+  m_ConnectedAnchor: {x: -0.00017586198, y: 0.105748355, z: -0.011174985}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 0, z: 1}
   m_TwistLimitSpring:
@@ -15458,7 +15485,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.09789337, y: -0.058758423, z: -0.0058382195}
+  m_ConnectedAnchor: {x: -0.09789337, y: -0.058758423, z: -0.005834405}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 0, z: 1}
   m_TwistLimitSpring:
@@ -15674,7 +15701,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.0021896362, y: -0.41696334, z: 0.007014334}
+  m_ConnectedAnchor: {x: 0.0021896362, y: -0.41696334, z: 0.0070105195}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 0, z: 1}
   m_TwistLimitSpring:
@@ -16969,6 +16996,7 @@ GameObject:
   - component: {fileID: 1631951716}
   - component: {fileID: 1631951718}
   - component: {fileID: 1631951719}
+  - component: {fileID: 1631951720}
   m_Layer: 5
   m_Name: Stamina Wheel
   m_TagString: Untagged
@@ -17055,6 +17083,24 @@ MonoBehaviour:
   target: {fileID: 2141135629}
   offset: {x: -40, y: 40}
   targetCamera: {fileID: 1553097854}
+--- !u!114 &1631951720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1631951714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b49474c8fbab48c4582cc80de1469f85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  stamina: {fileID: 495564465}
+  redDepelenishRate: 0.5
+  wheelFadeRate: 1
+  canvasGroup: {fileID: 0}
+  greenWheel: {fileID: 0}
+  redWheel: {fileID: 0}
+  yellowWheel: {fileID: 0}
 --- !u!1 &1655001084
 GameObject:
   m_ObjectHideFlags: 0
@@ -20123,7 +20169,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.5999971, y: 1.499985}
+  m_AnchoredPosition: {x: 0.5999985, y: 1.4999847}
   m_SizeDelta: {x: 115.06, y: 62.28}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1869936438

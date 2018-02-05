@@ -54,42 +54,9 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     private Vector3 velocity;
     private bool alive = true;
 
-    [Header("Stamina")]
-    public float initialStamina = 1;
-    public float staminaReplenishDelay = 2;
-    public float staminaReplenishRate = 0.3f;
-    public float staminaFullReplenishDelay = 2;
-    public float staminaFullReplenishRate = 0.3f;
-    public float staminaRedDeplenishRate = 0.5f;
-    public float staminaWheelFadeRate = 1;
-    public CanvasGroup staminaWheelCanvasGroup;
-    public Image staminaWheelGreen;
-    public Image staminaWheelRed;
-    public Image staminaWheelYellow;
-    private float stamina;
-    private float staminaRed;
-    private float staminaYellow;
-    private float staminaReplenishDelayTime;
-    private float staminaFullReplenishDelayTime;
-    private bool staminaFullReplenishing;
-
-    [Header("Health")]
-    public float initialHealth = 100;
-    public float maxHealth = 100;
-    public Image healthBar;
-    public Image healthBarLag;
-    public float healthLagRate = 30;
-    private float healthLag;
-    private float health;
-
-    [Header("Mana")]
-    public float initialMana = 100;
-    public float maxMana = 100;
-    public Image manaBar;
-    public Image manaBarLag;
-    public float manaLagRate = 30;
-    private float manaLag;
-    private float mana;
+    public Stamina stamina;
+    public Health health;
+    public Mana mana;
 
     [Header("Spell Bar")]
     public Spell[] spells;
@@ -148,9 +115,6 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
 
     private void Start()
     {
-        health = initialHealth;
-        mana = initialMana;
-        stamina = initialStamina;
 
         // Setup spell bar
         for (int i = 0; i < spells.Length; i++)
@@ -174,43 +138,6 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
         SwitchSpell();
         Attack();
         UpdatePhysics();
-        UpdateStamina();
-        UpdateHealth();
-        UpdateMana();
-    }
-
-    private void UpdateMana()
-    {
-        mana = Mathf.Clamp(mana, 0, maxMana);
-
-        if (manaLag > mana)
-        {
-            manaLag -= manaLagRate * Time.deltaTime;
-        }
-        else
-        {
-            manaLag = mana;
-        }
-
-        manaBar.fillAmount = mana / maxMana;
-        manaBarLag.fillAmount = manaLag / maxMana;
-    }
-
-    private void UpdateHealth()
-    {
-        health = Mathf.Clamp(health, 0, maxHealth);
-
-        if (healthLag > health)
-        {
-            healthLag -= healthLagRate * Time.deltaTime;
-        }
-        else
-        {
-            healthLag = health;
-        }
-
-        healthBar.fillAmount = health / maxHealth;
-        healthBarLag.fillAmount = healthLag / maxHealth;
     }
 
     private void ZoomCrosshair()
@@ -371,12 +298,12 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
             switch (spells[currentSpell].name)
             {
                 case "Melee":
-                    if (meleeCooldownTime <= 0 && stamina > 0)
+                    if (meleeCooldownTime <= 0 && stamina.HasStamina)
                     {
                         animator.SetTrigger("Melee");
                         meleeStopDurationTime = meleeStopDuration;
                         meleeCooldownTime = meleeCooldown;
-                        UseStamina(meleeStaminaCost);
+                        stamina.UseStamina(meleeStaminaCost);
 
                         // Enable trail
                         meleeFistTrail.enabled = true;
@@ -389,22 +316,22 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
                     break;
 
                 case "Healing":
-                    if (healingCooldownTime <= 0 && mana > 0)
+                    if (healingCooldownTime <= 0 && mana.HasMana)
                     {
                         healingCooldownTime = healingCooldown;
                         healingStopDurationTime = healingStopDuration;
                         animator.SetTrigger("Healing");
 
                         // Use up mana
-                        mana -= healingManaCost;
+                        mana.UseMana(healingManaCost);
 
                         // Replenish health
-                        health += healingHealthAmount;
+                        health.Heal(healingHealthAmount);
                     }
                     break;
 
                 case "Basic":
-                    if (basicSpellCooldownTime <= 0 && mana > 0 && zoomCrosshairState == ZoomCrosshairState.Zoomed)
+                    if (basicSpellCooldownTime <= 0 && mana.HasMana && zoomCrosshairState == ZoomCrosshairState.Zoomed)
                     {
                         basicSpellCooldownTime = basicSpellCooldown;
 
@@ -430,87 +357,11 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
                         newBasicSpell.shooter = gameObject;
 
                         // Use up mana
-                        mana -= basicSpellManaCost;
+                        mana.UseMana(basicSpellManaCost);
                     }
                     break;
             }
         }
-    }
-
-    private void UpdateStamina()
-    {
-        if (staminaFullReplenishing)
-        {
-            // Replenish stamina fully
-            // Don't change stamina until completely full to prevent player from using stamina when full-replenishing
-            // Think of stamina as "spendable stamina"
-            staminaFullReplenishDelayTime += Time.deltaTime;
-            if (staminaFullReplenishDelayTime >= staminaFullReplenishDelay)
-            {
-                staminaYellow += staminaFullReplenishRate * Time.deltaTime;
-            }
-
-            // Check if stamina is full again
-            if (staminaYellow >= 1)
-            {
-                staminaFullReplenishing = false;
-                staminaYellow = 0;
-                stamina = 1;
-            }
-        }
-        else
-        {
-            // Replenish stamina
-            staminaReplenishDelayTime += Time.deltaTime;
-            if (staminaReplenishDelayTime >= staminaReplenishDelay)
-            {
-                stamina += staminaReplenishRate * Time.deltaTime;
-            }
-
-            stamina = Mathf.Clamp(stamina, 0, 1);
-
-            // Check if stamina ran out
-            if (stamina <= 0)
-            {
-                staminaFullReplenishing = true;
-                staminaFullReplenishDelayTime = 0;
-            }
-        }
-
-        // Change stamina red to the actual stamina value slowly
-        if (staminaRed > stamina)
-        {
-            staminaRed -= staminaRedDeplenishRate * Time.deltaTime;
-        }
-        else
-        {
-            staminaRed = stamina;
-        }
-
-        // Render stamina
-        staminaWheelGreen.fillAmount = stamina;
-        staminaWheelRed.fillAmount = staminaRed;
-        staminaWheelYellow.fillAmount = staminaYellow;
-
-        // Fade out stamina if stamina = 1
-        // Else, fade in
-        float staminaWheelAlpha = staminaWheelCanvasGroup.alpha;
-        if (stamina == 1)
-        {
-            staminaWheelAlpha -= staminaWheelFadeRate * Time.deltaTime;
-        }
-        else
-        {
-            staminaWheelAlpha += staminaWheelFadeRate * Time.deltaTime;
-        }
-        staminaWheelAlpha = Mathf.Clamp(staminaWheelAlpha, 0, 1);
-        staminaWheelCanvasGroup.alpha = staminaWheelAlpha;
-    }
-
-    private void UseStamina(float cost)
-    {
-        stamina -= cost;
-        staminaReplenishDelayTime = 0;
     }
 
     private void Walk()
@@ -524,7 +375,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
 
         // Find walk mode
         int walkMode;
-        if (runInput && stamina > 0)
+        if (runInput && stamina.HasStamina)
         {
             walkMode = 1;
         }
@@ -564,7 +415,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
             {
                 case 1:
                     speed = runningSpeed;
-                    UseStamina(runningStaminaCost * Time.deltaTime);
+                    stamina.UseStamina(runningStaminaCost * Time.deltaTime);
                     break;
 
                 case 2:
@@ -591,10 +442,10 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
         bool jumpInput = Input.GetButtonDown("Jump");
 
         // Set velocity
-        if (jumpInput && characterController.isGrounded && stamina > 0 && meleeStopDurationTime <= 0)
+        if (jumpInput && characterController.isGrounded && stamina.HasStamina && meleeStopDurationTime <= 0)
         {
             velocity.y += jumpingSpeed;
-            UseStamina(jumpingStaminaCost);
+            stamina.UseStamina(jumpingStaminaCost);
         }
     }
 
@@ -629,21 +480,17 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
 
     public void AbsorbMana(float amount)
     {
-        mana += amount;
+        mana.ReplenishMana(amount);
     }
 
     public bool CanAbsorb()
     {
-        return mana < maxMana;
+        return !mana.MaxMana;
     }
 
     public void Hurt(float amount, bool createsMana = false)
     {
-        health -= amount;
-        if (health <= 0)
-        {
-            alive = false;
-            ragdoll.SetEnabled(true);
-        }
+        alive = false;
+        ragdoll.SetEnabled(true);
     }
 }
