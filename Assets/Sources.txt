@@ -16,6 +16,14 @@ Particle effects:
 3D Games Effects Pack Free licensed by Creepy Cat
 Avaliable on http://u3d.as/icf
 (Unity Asset Store License)
+CloudsToy licensed by Julian Oliden
+Avaliable on https://assetstore.unity.com/packages/tools/particles-effects/cloudstoy-35559
+(Unity Asset Store License)
+Winter Zone Mini licensed by MeshZone3D
+Avaliable on https://assetstore.unity.com/packages/3d/environments/landscapes/winter-zone-mini-107583
+(Unity Asset Store License)
+Snowflake licensed by Unity Technologies
+As part of legacy Standard Assets (Particles Package)
 
 Music and sound:
 
