@@ -51,17 +51,12 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     public CharacterController characterController;
     public Animator animator;
     public Ragdoll ragdoll;
+    private Vector3 velocity;
     private bool alive = true;
 
     public Stamina stamina;
     public Health health;
     public Mana mana;
-    public CharacterPhysics characterPhysics;
-    public CameraShake cameraShake;
-    public HitPause hitPause;
-    public TimeManager timeManager;
-    public CharacterGravity characterGravity;
-    public ManaParticleSink manaParticleSink;
 
     [Header("Spell Bar")]
     public Spell[] spells;
@@ -82,7 +77,6 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     public float meleeFistTrailDuration = 0.5f;
     public float meleeDamage = 10;
     public float meleeDamageDelay = 0.15f;
-    public float meleeHitPauseTime = 0.1f;
     private float meleeCooldownTime;
     private float meleeStopDurationTime;
     private float meleeFistTrailDurationTime;
@@ -119,13 +113,9 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     [Header("Crosshair")]
     public float crosshairFallbackDistanceFromCamera = 100;
 
-    [Header("Death")]
-    public AudioClip deathMusic;
-    public AudioSource backgroundMusicSource;
-    public float deathTimeScale = 0.3f;
-
     private void Start()
     {
+
         // Setup spell bar
         for (int i = 0; i < spells.Length; i++)
         {
@@ -142,19 +132,12 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
 
     private void Update()
     {
-        if (alive)
-        {
-            Walk();
-            Jump();
-            Attack();
-        }
+        Walk();
+        Jump();
         ZoomCrosshair();
         SwitchSpell();
-
-        if (!alive)
-        {
-            timeManager.timeScale = deathTimeScale;
-        }
+        Attack();
+        UpdatePhysics();
     }
 
     private void ZoomCrosshair()
@@ -238,13 +221,13 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
         if (Input.GetButton("Switch Spells"))
         {
             spellBarActivated = true;
-            timeManager.timeScale = spellBarTimescale;
+            Time.timeScale = spellBarTimescale;
             spellBarCanvasGroup.alpha = 1;
         }
         else
         {
             spellBarActivated = false;
-            timeManager.timeScale = 1;
+            Time.timeScale = 1;
             spellBarCanvasGroup.alpha = 0;
         }
 
@@ -292,8 +275,6 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
             meleeDamageDelayTime -= Time.deltaTime;
             if (meleeDamageDelayTime <= 0)
             {
-                bool didHitHurtable = false;
-
                 // Hurt hurtables
                 Collider[] collidersInAttackArea = Physics.OverlapBox(meleeAttackArea.position, meleeAttackArea.localScale / 2, meleeAttackArea.rotation);
                 foreach (Collider colliderInAttackArea in collidersInAttackArea)
@@ -305,25 +286,10 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
                     if (hurtable != null && colliderInAttackArea.gameObject != gameObject)
                     {
                         hurtable.Hurt(meleeDamage, true);
-                        didHitHurtable = true;
-
-                        // Hit effects
-                        HitPause otherHitPause = colliderInAttackArea.GetComponent<HitPause>();
-                        if (otherHitPause)
-                        {
-                            otherHitPause.Pause(meleeHitPauseTime);
-                        }
                     }
                 }
 
                 meleeDamageDelayActivated = false;
-
-                if (didHitHurtable)
-                {
-                    // Hit effects
-                    cameraShake.Shake(0.3f);
-                    hitPause.Pause(meleeHitPauseTime);
-                }
             }
         }
 
@@ -429,10 +395,10 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
         if (inputDirection == Vector2.zero || meleeStopDurationTime > 0 || healingStopDurationTime > 0)
         {
             animator.SetBool("Walking", false);
-
+            
             // Set velocity
-            characterPhysics.velocity.x = 0;
-            characterPhysics.velocity.z = 0;
+            velocity.x = 0;
+            velocity.z = 0;
         }
         else
         {
@@ -461,8 +427,8 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
                     break;
             }
             Vector2 displacement = direction.normalized * Mathf.Clamp(inputDirection.magnitude, 0, 1) * speed;
-            characterPhysics.velocity.x = displacement.x;
-            characterPhysics.velocity.z = displacement.y;
+            velocity.x = displacement.x;
+            velocity.z = displacement.y;
 
             // Turn player towards moving direction
             Vector3 direction3d = new Vector3(direction.x, 0, direction.y);
@@ -478,21 +444,38 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
         // Set velocity
         if (jumpInput && characterController.isGrounded && stamina.HasStamina && meleeStopDurationTime <= 0)
         {
-            characterPhysics.velocity.y += jumpingSpeed;
+            velocity.y += jumpingSpeed;
             stamina.UseStamina(jumpingStaminaCost);
         }
     }
 
+    private void UpdatePhysics()
+    {
+        // Update gravity if above ground
+        if (!characterController.isGrounded)
+        {
+            velocity.y += Physics.gravity.y * Time.deltaTime;
+        }
+        // Stop velocity if on ground but still going down
+        else
+        {
+            if (velocity.y < 0)
+            {
+                velocity.y = -0.1f;
+            }
+        }
+
+        // Move player based on velocity
+        characterController.Move(velocity * Time.deltaTime);
+    }
+
     public void Die()
     {
+        // Set not alive
         alive = false;
+
+        // Ragdoll
         ragdoll.SetEnabled(true);
-
-        // Play effect
-        backgroundMusicSource.PlayOneShot(deathMusic);
-
-        // Release mana
-        manaParticleSink.enabled = false;
     }
 
     public void AbsorbMana(float amount)
@@ -507,15 +490,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
 
     public void Hurt(float amount, bool createsMana = false)
     {
-        health.Hurt(amount);
-        if (health.Dead)
-        {
-            Die();
-        }
-    }
-
-    public void Kill(bool createsMana = false)
-    {
-        Hurt(999999, createsMana);
+        alive = false;
+        ragdoll.SetEnabled(true);
     }
 }

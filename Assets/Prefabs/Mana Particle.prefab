@@ -101,8 +101,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   armingTime: 1.5
   manaAmount: 2
-  absorbRadius: 0.1
-  despawnTime: 20
   rb: {fileID: 54608134619244110}
 --- !u!135 &135652771723513902
 SphereCollider:
@@ -736,7 +734,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 60
+      scalar: 1000
       minScalar: 10
       maxCurve:
         serializedVersion: 2

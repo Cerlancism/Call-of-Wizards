@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,7 +10,6 @@ public class Guard : MonoBehaviour, IHurtable {
     public CharacterController characterController;
     public Animator animator;
     public Ragdoll ragdoll;
-    public Health health;
     private bool alive = true;
     private Vector3 velocity;
     private GameObject player;
@@ -27,7 +25,9 @@ public class Guard : MonoBehaviour, IHurtable {
     private float meleeStopDurationTime;
     private float meleeDamageDelayTime;
     private bool meleeDamageDelayActivated;
-    public LayerMask meleeLayerMask;
+
+    [Header("Health")]
+    public float health = 40;
 
     [Header("Mana")]
     public Transform manaParticleSpawn;
@@ -53,7 +53,7 @@ public class Guard : MonoBehaviour, IHurtable {
                 if (meleeDamageDelayTime <= 0)
                 {
                     // Hurt hurtables
-                    Collider[] collidersInAttackArea = Physics.OverlapBox(meleeAttackArea.position, meleeAttackArea.localScale / 2, meleeAttackArea.rotation, meleeLayerMask);
+                    Collider[] collidersInAttackArea = Physics.OverlapBox(meleeAttackArea.position, meleeAttackArea.localScale / 2, meleeAttackArea.rotation);
                     foreach (Collider colliderInAttackArea in collidersInAttackArea)
                     {
                         IHurtable hurtable = colliderInAttackArea.GetComponent<IHurtable>();
@@ -109,10 +109,9 @@ public class Guard : MonoBehaviour, IHurtable {
     public void Hurt(float amount, bool createsMana)
     {
         animator.SetTrigger("Impact");
-        meleeDamageDelayActivated = false;
-        health.Hurt(amount);
+        health -= amount;
 
-        if (health.Dead)
+        if (health <= 0)
         {
             Die(createsMana);
         }
@@ -140,10 +139,5 @@ public class Guard : MonoBehaviour, IHurtable {
         Gizmos.DrawWireSphere(transform.position, playerDetectionRadius);
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, playerAttackRadius);
-    }
-
-    public void Kill(bool createsMana = false)
-    {
-        Hurt(9999999, createsMana);
     }
 }

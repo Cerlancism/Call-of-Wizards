@@ -16,10 +16,8 @@ TagManager:
   - 
   - Camera Wall
   - Mana Particle
-  - Enemy
+  - Character
   - Projectile
-  - Player
-  - Ragdoll
   - 
   - 
   - 
@@ -36,7 +34,9 @@ TagManager:
   - 
   - 
   - 
-  - CloudsToy
+  - 
+  - 
+  - 
   - 
   m_SortingLayers:
   - name: Default

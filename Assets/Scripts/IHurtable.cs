@@ -4,5 +4,4 @@ using UnityEngine;
 
 public interface IHurtable {
     void Hurt(float amount, bool createsMana = false);
-    void Kill(bool createsMana = false);
 }

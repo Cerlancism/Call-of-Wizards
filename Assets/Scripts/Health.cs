@@ -15,14 +15,6 @@ public class Health : MonoBehaviour {
         }
     }
 
-    public bool Dead
-    {
-        get
-        {
-            return health <= 0;
-        }
-    }
-
     private void Start ()
     {
         health = initialHealth;
