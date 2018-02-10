@@ -29,23 +29,42 @@ public class Guard : MonoBehaviour, IHurtable {
     private bool meleeDamageDelayActivated;
     public LayerMask meleeLayerMask;
 
+    [Header("Impact")]
+    public float impactDuration = 1;
+    private float impactDurationTime;
+
     [Header("Mana")]
     public Transform manaParticleSpawn;
     public ManaParticle manaParticle;
     public int manaParticlesAmount;
     public float manaParticleExplosionForce;
 
+    //[Header("Thought")]
+    private ThoughtState thoughtState;
+    private enum ThoughtState { Patrol, Combat };
+
+    [Header("Patrol settings")]
+    public PatrolStep[] patrolSteps;
+    private int currentStep;
+
     private void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
+
+        // Disable all patrol steps by default
+        foreach (PatrolStep patrolStep in patrolSteps)
+        {
+            patrolStep.enabled = false;
+        }
     }
 
     private void Update()
     {
         if (alive)
         {
-            Vector3 displacement = player.transform.position - transform.position;
-            float distance = displacement.magnitude;
+            /*Vector3 displacement = player.transform.position - transform.position;
+            float distance = displacement.magnitude;*/
+            Vector2 direction = Vector2.zero;
 
             if (meleeDamageDelayActivated)
             {
@@ -70,7 +89,7 @@ public class Guard : MonoBehaviour, IHurtable {
                 }
             }
 
-            meleeCooldownTime -= Time.deltaTime;
+            /*meleeCooldownTime -= Time.deltaTime;
             if (distance <= playerAttackRadius && meleeCooldownTime <= 0)
             {
                 animator.SetTrigger("Melee");
@@ -81,15 +100,44 @@ public class Guard : MonoBehaviour, IHurtable {
                 // Damage after some time
                 meleeDamageDelayActivated = true;
                 meleeDamageDelayTime = meleeDamageDelay;
+            }*/
+
+            switch (thoughtState)
+            {
+                case ThoughtState.Patrol:
+                    PatrolStep patrolStep = patrolSteps[currentStep];
+                    direction = patrolStep.Direction();
+
+                    // Next step
+                    if (patrolStep.Next())
+                    {
+                        // Disable
+                        patrolStep.enabled = false;
+
+                        // Next and loop
+                        currentStep++;
+                        if (currentStep >= patrolSteps.Length)
+                        {
+                            currentStep = 0;
+                        }
+
+                        // Enable
+                        patrolStep = patrolSteps[currentStep];
+                        patrolStep.enabled = true;
+                    }
+                    break;
+                case ThoughtState.Combat:
+                    break;
             }
 
             meleeStopDurationTime -= Time.deltaTime;
-            if (distance <= playerDetectionRadius && meleeStopDurationTime <= 0)
+            impactDurationTime -= Time.deltaTime;
+            direction.Normalize();
+            if (meleeStopDurationTime <= 0 && impactDurationTime <= 0 && direction != Vector2.zero)
             {
                 // Walk
                 animator.SetBool("Walking", true);
 
-                Vector2 direction = new Vector2(displacement.x, displacement.z).normalized;
                 velocity.x = direction.x * speed;
                 velocity.z = direction.y * speed;
 
@@ -109,6 +157,7 @@ public class Guard : MonoBehaviour, IHurtable {
     public void Hurt(float amount, bool createsMana)
     {
         animator.SetTrigger("Impact");
+        impactDurationTime = impactDuration;
         meleeDamageDelayActivated = false;
         health.Hurt(amount);
 

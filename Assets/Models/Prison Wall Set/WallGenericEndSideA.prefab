@@ -21,12 +21,13 @@ GameObject:
   - component: {fileID: 4082051007229112}
   - component: {fileID: 33749393227350582}
   - component: {fileID: 23491872404427050}
-  m_Layer: 0
+  - component: {fileID: 65236607003475314}
+  m_Layer: 8
   m_Name: WallGeneric
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1322800271380354
 GameObject:
@@ -38,12 +39,13 @@ GameObject:
   - component: {fileID: 4015768366104064}
   - component: {fileID: 33052285732440926}
   - component: {fileID: 23320697309260318}
-  m_Layer: 0
+  - component: {fileID: 65231521961090490}
+  m_Layer: 8
   m_Name: WallJoin
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1394298788769912
 GameObject:
@@ -55,12 +57,13 @@ GameObject:
   - component: {fileID: 4392000568714034}
   - component: {fileID: 33227129589367066}
   - component: {fileID: 23658181666493126}
-  m_Layer: 0
+  - component: {fileID: 65512217725297208}
+  m_Layer: 8
   m_Name: WallGenericEdge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1395548752596468
 GameObject:
@@ -72,12 +75,13 @@ GameObject:
   - component: {fileID: 4766391093310516}
   - component: {fileID: 33706762917775496}
   - component: {fileID: 23816449976489340}
-  m_Layer: 0
+  - component: {fileID: 65552163604344766}
+  m_Layer: 8
   m_Name: WallGenericEdgeTop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!1 &1539583587963722
 GameObject:
@@ -87,12 +91,12 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4124091424259528}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: WallGenericEndSideA
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!4 &4015768366104064
 Transform:
@@ -327,3 +331,51 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1075557810710908}
   m_Mesh: {fileID: 4300004, guid: 40dff8fb894ad23489801183c36ef212, type: 3}
+--- !u!65 &65231521961090490
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1322800271380354}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.0049999994, y: 0.005023705, z: 0.0400021}
+  m_Center: {x: 0.0024265952, y: -0.0025118142, z: 0.0200012}
+--- !u!65 &65236607003475314
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1075557810710908}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.004999999, y: 0.045104608, z: 0.0400002}
+  m_Center: {x: 0.002426595, y: 0.022424027, z: 0.02000025}
+--- !u!65 &65512217725297208
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1394298788769912}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.0049999994, y: 0.0049999994, z: 0.040001344}
+  m_Center: {x: 0.0024633196, y: -0.0025067932, z: 0.020000821}
+--- !u!65 &65552163604344766
+BoxCollider:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1395548752596468}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.005, y: 0.004999999, z: 0.040001344}
+  m_Center: {x: 0.0024634353, y: -0.002506793, z: 0.020000687}

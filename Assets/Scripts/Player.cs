@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -120,9 +120,11 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     public float crosshairFallbackDistanceFromCamera = 100;
 
     [Header("Death")]
-    public AudioClip deathMusic;
-    public AudioSource backgroundMusicSource;
+    public AudioSource deathMusic;
     public float deathTimeScale = 0.3f;
+    public GameObject[] deathHiddenUIs;
+    public GameObject[] deathShownUIs;
+    public bool loadingScreen = false;
 
     private void Start()
     {
@@ -148,6 +150,11 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
         if (!alive)
         {
             timeManager.timeScale = deathTimeScale;
+
+            if (Input.GetButtonDown("Respawn"))
+            {
+                SceneManager.LoadSceneAsync(loadingScreen ? "Loading" : "Game");
+            }
         }
     }
 
@@ -505,8 +512,15 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
         ragdoll.SetEnabled(true);
 
         // Play effect
-        backgroundMusicSource.PlayOneShot(deathMusic);
-
+        deathMusic.Play();
+        foreach (GameObject deathHiddenUI in deathHiddenUIs)
+        {
+            deathHiddenUI.SetActive(false);
+        }
+        foreach (GameObject deathShownUI in deathShownUIs)
+        {
+            deathShownUI.SetActive(true);
+        }
         // Release mana
         manaParticleSink.enabled = false;
     }

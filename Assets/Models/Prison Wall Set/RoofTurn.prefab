@@ -22,7 +22,7 @@ GameObject:
   - component: {fileID: 33657731136375748}
   - component: {fileID: 23746405437334760}
   - component: {fileID: 65805508556153900}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: RoofTurn
   m_TagString: Untagged
   m_Icon: {fileID: 0}

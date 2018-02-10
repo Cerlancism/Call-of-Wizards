@@ -18,6 +18,7 @@ public class LoadingManager : MonoBehaviour {
         {
             if (!loadingAsync.isDone)
             {
+                Debug.Log(loadingAsync.progress);
                 progressBar.SetProgress(loadingAsync.progress);
             }
         }

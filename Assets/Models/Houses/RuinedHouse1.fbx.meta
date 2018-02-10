@@ -1,0 +1,182 @@
+fileFormatVersion: 2
+guid: c7795071bab962c468103638a4826aa8
+timeCreated: 1518253484
+licenseType: Free
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: Balcony
+    100002: Base
+    100004: Base roof
+    100006: Chimney
+    100008: Door
+    100010: Door frame
+    100012: Lamp
+    100014: //RootNode
+    100016: Side house
+    100018: Side house roof
+    100020: Support beams
+    100022: Window
+    100024: Windows frame
+    100026: Windows frame 2
+    100028: Wood thing bottom
+    100030: Wood thing bottom 2
+    100032: Wood things
+    100034: Wood things 2
+    100036: Wood things 3
+    400000: Balcony
+    400002: Base
+    400004: Base roof
+    400006: Chimney
+    400008: Door
+    400010: Door frame
+    400012: Lamp
+    400014: //RootNode
+    400016: Side house
+    400018: Side house roof
+    400020: Support beams
+    400022: Window
+    400024: Windows frame
+    400026: Windows frame 2
+    400028: Wood thing bottom
+    400030: Wood thing bottom 2
+    400032: Wood things
+    400034: Wood things 2
+    400036: Wood things 3
+    2100000: glass
+    2100002: Wood
+    2100004: Stone
+    2100006: Roof
+    2100008: Concrete
+    2300000: Balcony
+    2300002: Base
+    2300004: Base roof
+    2300006: Chimney
+    2300008: Door
+    2300010: Door frame
+    2300012: Side house
+    2300014: Side house roof
+    2300016: Support beams
+    2300018: Window
+    2300020: Windows frame
+    2300022: Windows frame 2
+    2300024: Wood thing bottom
+    2300026: Wood thing bottom 2
+    2300028: Wood things
+    2300030: Wood things 2
+    2300032: Wood things 3
+    3300000: Balcony
+    3300002: Base
+    3300004: Base roof
+    3300006: Chimney
+    3300008: Door
+    3300010: Door frame
+    3300012: Side house
+    3300014: Side house roof
+    3300016: Support beams
+    3300018: Window
+    3300020: Windows frame
+    3300022: Windows frame 2
+    3300024: Wood thing bottom
+    3300026: Wood thing bottom 2
+    3300028: Wood things
+    3300030: Wood things 2
+    3300032: Wood things 3
+    4300000: Window
+    4300002: Door
+    4300004: Chimney
+    4300006: Side house roof
+    4300008: Base roof
+    4300010: Door frame
+    4300012: Wood thing bottom 2
+    4300014: Windows frame 2
+    4300016: Windows frame
+    4300018: Support beams
+    4300020: Wood thing bottom
+    4300022: Wood things 3
+    4300024: Wood things
+    4300026: Balcony
+    4300028: Side house
+    4300030: Base
+    4300032: Wood things 2
+    10800000: Lamp
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

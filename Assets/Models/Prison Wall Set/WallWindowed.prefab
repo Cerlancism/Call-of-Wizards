@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4854364654322708}
   - component: {fileID: 33659088556690442}
   - component: {fileID: 23100552513771460}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Window
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -39,7 +39,7 @@ GameObject:
   - component: {fileID: 33902396190201340}
   - component: {fileID: 23428765486083114}
   - component: {fileID: 65345755137197536}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: WallWindowed
   m_TagString: Untagged
   m_Icon: {fileID: 0}
