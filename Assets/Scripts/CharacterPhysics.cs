@@ -28,4 +28,15 @@ public class CharacterPhysics : MonoBehaviour {
             return Physics.Raycast(bottom, Vector3.down, lenientGroundedDistance, lenientGroundedLayerMask, QueryTriggerInteraction.Ignore);
         }
     }
+
+    public Transform GroundLenient
+    {
+        get
+        {
+            RaycastHit hit;
+            Vector3 bottom = transform.position + characterController.center + (Vector3.down * characterController.height / 2);
+            Physics.Raycast(bottom, Vector3.down, out hit, lenientGroundedDistance, lenientGroundedLayerMask, QueryTriggerInteraction.Ignore);
+            return hit.transform;
+        }
+    }
 }

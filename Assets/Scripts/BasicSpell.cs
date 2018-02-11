@@ -20,7 +20,7 @@ public class BasicSpell : MonoBehaviour {
 
     private void OnTriggerEnter(Collider collider)
     {
-        if (collider.gameObject != shooter)
+        if (!collider.isTrigger && collider.gameObject != shooter)
         {
             // Hurt if hurtable
             IHurtable hurtable = collider.GetComponent<IHurtable>();

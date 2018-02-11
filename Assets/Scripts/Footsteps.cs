@@ -1,11 +1,20 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+[Serializable]
+public class FootstepSet
+{
+    public string name;
+    public AudioClip[] footstepSounds;
+}
 
 public class Footsteps : MonoBehaviour {
     public AudioSource rightFootAudioSource;
     public AudioSource leftFootAudioSource;
-    public AudioClip[] footstepSounds;
+    public FootstepSet[] footstepSets;
+    public string defaultFootstepSet;
 
     public CharacterPhysics characterPhysics;
 
@@ -21,10 +30,37 @@ public class Footsteps : MonoBehaviour {
 
     private void OnFootstep(AudioSource source, float volume)
     {
-        if (characterPhysics.IsGroundedLenient)
+        Transform ground = characterPhysics.GroundLenient;
+        if (ground != null)
         {
-            AudioClip randomFootstepSound = footstepSounds[Random.Range(0, footstepSounds.Length - 1)];
+            FootstepMaterial footstepMaterial = ground.GetComponent<FootstepMaterial>();
+
+            FootstepSet footstepSet;
+            if (footstepMaterial != null)
+            {
+                footstepSet = GetFootstepSet(footstepMaterial.material);
+            }
+            else
+            {
+                footstepSet = GetFootstepSet(defaultFootstepSet);
+            }
+
+            AudioClip[] footstepSounds = footstepSet.footstepSounds;
+            AudioClip randomFootstepSound = footstepSounds[UnityEngine.Random.Range(0, footstepSounds.Length - 1)];
             source.PlayOneShot(randomFootstepSound, volume);
         }
+    }
+
+    private FootstepSet GetFootstepSet(string name)
+    {
+        foreach (FootstepSet footstepSet in footstepSets)
+        {
+            if (footstepSet.name == name)
+            {
+                return footstepSet;
+            }
+        }
+
+        return null;
     }
 }

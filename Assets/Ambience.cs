@@ -5,6 +5,7 @@ using UnityEngine;
 public class Ambience : MonoBehaviour {
     public AudioSource ambience;
     public AudioListener targetListener;
+    private bool isActive = false;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -12,6 +13,7 @@ public class Ambience : MonoBehaviour {
         if (audioListener == targetListener)
         {
             ambience.Play();
+            isActive = true;
         }
     }
 
@@ -20,7 +22,16 @@ public class Ambience : MonoBehaviour {
         AudioListener audioListener = other.GetComponent<AudioListener>();
         if (audioListener == targetListener)
         {
-            ambience.Stop();
+            ambience.Pause();
+            isActive = false;
+        }
+    }
+
+    public bool IsActive
+    {
+        get
+        {
+            return isActive;
         }
     }
 }

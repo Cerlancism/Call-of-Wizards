@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Guard : MonoBehaviour, IHurtable
+public class Guard : MonoBehaviour, IHurtable, IFlammable
 {
     [Header("Movement")]
     public float speed = 1;
@@ -306,7 +306,7 @@ public class Guard : MonoBehaviour, IHurtable
         }
     }
 
-    public void Hurt(float amount, bool createsMana)
+    public void Hurt(float amount, bool createsMana = false)
     {
         animator.SetTrigger("Impact");
         impactDurationTime = impactDuration;
@@ -321,7 +321,7 @@ public class Guard : MonoBehaviour, IHurtable
         }
     }
 
-    private void Die(bool createsMana)
+    private void Die(bool createsMana = false)
     {
         alive = false;
 
@@ -347,5 +347,10 @@ public class Guard : MonoBehaviour, IHurtable
     public void Kill(bool createsMana = false)
     {
         Hurt(9999999, createsMana);
+    }
+
+    public void Flame(float amount)
+    {
+        Hurt(amount);
     }
 }
