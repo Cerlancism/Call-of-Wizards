@@ -32,6 +32,7 @@ public class Spell
     public string name;
     public string displayName;
     public Sprite icon;
+    public Transform preview;
 }
 
 // ANIMATOR INTEGER PARAMETERS
@@ -72,6 +73,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     public CanvasGroup spellBarCanvasGroup;
     public float spellBarTimescale = 0.1f;
     public Image spellWheel;
+    public Transform spellPreview;
     private int currentSpell;
     private bool spellBarActivated;
 
@@ -105,6 +107,10 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     public Transform basicSpellEmitPosition;
     public float basicSpellManaCost = 5;
     private float basicSpellCooldownTime;
+
+    [Header("Fire")]
+    public Flamethrower flamethrower;
+    public float fireSpellManaCost = 20; // Per second
 
     [Header("Zoom Crosshair")]
     public CanvasGroup crosshairCanvasGroup;
@@ -275,6 +281,8 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
             spellBarCanvasGroup.alpha = 0;
         }
 
+        float previousSpell = currentSpell;
+
         if (spellBarActivated)
         {
             // Numbered navigation
@@ -301,6 +309,20 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
 
         // Preview spell in spellwheel
         spellWheel.sprite = spells[currentSpell].icon;
+
+        // Put spell preview
+        if (previousSpell != currentSpell)
+        {
+            foreach (Transform child in spellPreview)
+            {
+                Destroy(child.gameObject);
+            }
+
+            if (spells[currentSpell].preview != null)
+            {
+                Instantiate(spells[currentSpell].preview, spellPreview.position, Quaternion.identity, spellPreview);
+            }
+        }
     }
 
     private void Attack()
@@ -397,21 +419,9 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
                     {
                         basicSpellCooldownTime = basicSpellCooldown;
 
-                        // Get target by crosshair
-                        Vector3 target;
-                        RaycastHit hit;
-                        if (Physics.Raycast(playerCamera.GetComponent<Camera>().ViewportPointToRay(new Vector2(0.5f, 0.5f)), out hit))
-                        {
-                            target = hit.point;
-                        }
-                        else
-                        {
-                            target = playerCamera.position + playerCamera.forward * crosshairFallbackDistanceFromCamera;
-                        }
-
                         // Calculate projectile direction
                         Vector3 originalPosition = basicSpellEmitPosition.position;
-                        Vector3 direction = target - originalPosition;
+                        Vector3 direction = GetTargetUnderCrosshair() - originalPosition;
 
                         // Create projectile
                         BasicSpell newBasicSpell = Instantiate(basicSpell, originalPosition, Quaternion.identity);
@@ -424,6 +434,48 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
                     break;
             }
         }
+
+        bool fireOn = false;
+        if (Input.GetButton("Attack"))
+        {
+            switch (spells[currentSpell].name)
+            {
+                case "Fire":
+                    if (zoomCrosshairState == ZoomCrosshairState.Zoomed)
+                    {
+                        fireOn = true;
+                    }
+                    break;
+            }
+        }
+
+        if (fireOn && mana.HasMana)
+        {
+            flamethrower.transform.LookAt(GetTargetUnderCrosshair());
+            flamethrower.Play();
+            mana.UseMana(fireSpellManaCost * Time.deltaTime);
+        }
+        else
+        {
+            flamethrower.Stop();
+        }
+    }
+
+    private Vector3 GetTargetUnderCrosshair()
+    {
+        // Get target by crosshair
+        Vector3 target;
+        RaycastHit hit;
+        if (Physics.Raycast(playerCamera.GetComponent<Camera>().ViewportPointToRay(new Vector2(0.5f, 0.5f)), out hit))
+        {
+            target = hit.point;
+        }
+        else
+        {
+            target = playerCamera.position + playerCamera.forward * crosshairFallbackDistanceFromCamera;
+        }
+
+        return target;
     }
 
     private void Walk()

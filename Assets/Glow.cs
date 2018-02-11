@@ -5,5 +5,10 @@ using UnityEngine;
 public class Glow : MonoBehaviour {
     public Material[] materials;
 
-    
+    public void SetGlow()
+    {
+        foreach (Material material in materials)
+        {
+        }
+    }
 }

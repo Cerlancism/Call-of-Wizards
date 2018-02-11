@@ -2750,6 +2750,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20d5e85c4d154c746b69f3530a9e0116, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  speed: 2
+  runningSpeed: 5
+  turningSpeed: 6
+  characterController: {fileID: 143041747727731926}
+  animator: {fileID: 95467242272176408}
+  ragdoll: {fileID: 114595033255386208}
+  health: {fileID: 114494695552656802}
   activeViewAngle: 120
   peripheralViewAngle: 180
   eye: {fileID: 4254166661533460}
@@ -2757,18 +2764,20 @@ MonoBehaviour:
   opaqueLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  speed: 2
-  turningSpeed: 6
-  characterController: {fileID: 143041747727731926}
-  animator: {fileID: 95467242272176408}
-  ragdoll: {fileID: 114595033255386208}
-  health: {fileID: 114494695552656802}
+  initialThoughtState: 0
+  patrolSteps:
+  - {fileID: 114677325663742634}
+  - {fileID: 114831753046535260}
+  - {fileID: 114828561853523146}
+  - {fileID: 114831753046535260}
+  pathRecalculationInterval: 1
+  cornerReachRadius: 0.2
   playerAttackRadius: 1.15
   meleeCooldown: 2
   meleeStopDuration: 1.5
   meleeAttackArea: {fileID: 4069350869607696}
   meleeDamage: 30
-  meleeDamageDelay: 1
+  meleeDamageDelay: 0.75
   meleeLayerMask:
     serializedVersion: 2
     m_Bits: 4294966271
@@ -2778,12 +2787,6 @@ MonoBehaviour:
     type: 2}
   manaParticlesAmount: 10
   manaParticleExplosionForce: 3
-  initialThoughtState: 0
-  patrolSteps:
-  - {fileID: 114677325663742634}
-  - {fileID: 114831753046535260}
-  - {fileID: 114828561853523146}
-  - {fileID: 114831753046535260}
 --- !u!114 &114296217556080728
 MonoBehaviour:
   m_ObjectHideFlags: 1
