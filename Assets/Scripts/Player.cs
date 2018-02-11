@@ -53,6 +53,8 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     public CharacterController characterController;
     public Animator animator;
     public Ragdoll ragdoll;
+    public Glow glow;
+    [ColorUsage(false, true, 0f, 8f, 0.125f, 3f)] public Color hurtGlow;
     private bool alive = true;
 
     public Stamina stamina;
@@ -595,6 +597,8 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     public void Hurt(float amount, bool createsMana = false)
     {
         health.Hurt(amount);
+        //glow.SetGlow(hurtGlow);
+
         if (health.Dead)
         {
             Die();
