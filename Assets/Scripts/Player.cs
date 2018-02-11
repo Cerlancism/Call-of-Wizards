@@ -57,6 +57,14 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     [ColorUsage(false, true, 0f, 8f, 0.125f, 3f)] public Color hurtGlow;
     private bool alive = true;
 
+    public bool Alive
+    {
+        get
+        {
+            return alive;
+        }
+    }
+
     public Stamina stamina;
     public Health health;
     public Mana mana;

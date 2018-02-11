@@ -67,6 +67,9 @@ public class Guard : Enemy, IHurtable, IFlammable
 
     private void Start()
     {
+        // IMPORTANT
+        enemyManager.RegisterEnemy(this);
+
         player = GameObject.FindGameObjectWithTag("Player");
 
         thoughtState = initialThoughtState;
@@ -268,11 +271,13 @@ public class Guard : Enemy, IHurtable, IFlammable
                 {
                     patrolStep.enabled = false;
                 }
+                enemyManager.SetMetaEnemyState(this, MetaEnemyState.Idle);
                 break;
 
             case ThoughtState.Combat:
                 path = new NavMeshPath();
                 pathRecalculationTime = 0; // To immediately calculate path
+                enemyManager.SetMetaEnemyState(this, MetaEnemyState.Combat);
                 break;
         }
     }
@@ -323,6 +328,7 @@ public class Guard : Enemy, IHurtable, IFlammable
 
     private void Die(bool createsMana = false)
     {
+        enemyManager.SetMetaEnemyState(this, MetaEnemyState.Dead);
         alive = false;
 
         if (createsMana)
