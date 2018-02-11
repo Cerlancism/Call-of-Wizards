@@ -2750,6 +2750,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20d5e85c4d154c746b69f3530a9e0116, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyManager: {fileID: 0}
   speed: 2
   runningSpeed: 5
   turningSpeed: 6
