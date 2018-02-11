@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 #if UNITY_EDITOR
@@ -70,6 +71,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     public float offsetX = 100;
     public CanvasGroup spellBarCanvasGroup;
     public float spellBarTimescale = 0.1f;
+    public Image spellWheel;
     private int currentSpell;
     private bool spellBarActivated;
 
@@ -296,6 +298,9 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
         {
             spellBar.anchoredPosition = new Vector2(-offsetX * currentSpell, 0);
         }
+
+        // Preview spell in spellwheel
+        spellWheel.sprite = spells[currentSpell].icon;
     }
 
     private void Attack()
