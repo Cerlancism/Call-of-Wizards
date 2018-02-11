@@ -16,7 +16,7 @@ public class Guard : Enemy, IHurtable, IFlammable
     public Health health;
     private bool alive = true;
     private Vector3 velocity;
-    private GameObject player;
+    public Player player;
 
     [Header("Senses (Vision)")]
     public float activeViewAngle = 90;
@@ -69,8 +69,6 @@ public class Guard : Enemy, IHurtable, IFlammable
     {
         // IMPORTANT
         enemyManager.RegisterEnemy(this);
-
-        player = GameObject.FindGameObjectWithTag("Player");
 
         thoughtState = initialThoughtState;
         nextThoughtState = initialThoughtState;
@@ -138,25 +136,28 @@ public class Guard : Enemy, IHurtable, IFlammable
                     if (EnableCombat()) ChangeThoughtState(ThoughtState.Combat);
                     break;
                 case ThoughtState.Combat:
-                    Vector3 displacement = player.transform.position - transform.position;
-                    float distance = displacement.magnitude;
-
-                    // Run
-                    RecalculatePath();
-                    direction = MoveOnPath();
-                    running = true;
-
-                    // Fight
-                    if (distance <= playerAttackRadius && meleeCooldownTime <= 0)
+                    if (player.Alive)
                     {
-                        animator.SetTrigger("Melee");
+                        Vector3 displacement = player.transform.position - transform.position;
+                        float distance = displacement.magnitude;
 
-                        meleeStopDurationTime = meleeStopDuration;
-                        meleeCooldownTime = meleeCooldown;
+                        // Run
+                        RecalculatePath();
+                        direction = MoveOnPath();
+                        running = true;
 
-                        // Damage after some time
-                        meleeDamageDelayActivated = true;
-                        meleeDamageDelayTime = meleeDamageDelay;
+                        // Fight
+                        if (distance <= playerAttackRadius && meleeCooldownTime <= 0)
+                        {
+                            animator.SetTrigger("Melee");
+
+                            meleeStopDurationTime = meleeStopDuration;
+                            meleeCooldownTime = meleeCooldown;
+
+                            // Damage after some time
+                            meleeDamageDelayActivated = true;
+                            meleeDamageDelayTime = meleeDamageDelay;
+                        }
                     }
                     break;
             }
