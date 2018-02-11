@@ -49,6 +49,9 @@ Avaliable on https://opengameart.org/content/medieval
 Heroism (edited) licensed by Edward J. Blakeley (Submitted by Zefz)
 Avaliable on https://opengameart.org/content/heroism
 (GPL 3.0)
+Foot walking step sounds on stone, water, snow, wood and dirt licensed by Jute
+Avaliable on https://opengameart.org/content/foot-walking-step-sounds-on-stone-water-snow-wood-and-dirt
+(GPL 3.0)
 
 Textures:
 

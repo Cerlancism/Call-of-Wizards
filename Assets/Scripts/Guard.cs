@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Guard : MonoBehaviour, IHurtable, IFlammable
+public class Guard : Enemy, IHurtable, IFlammable
 {
     [Header("Movement")]
     public float speed = 1;
