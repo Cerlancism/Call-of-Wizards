@@ -56,6 +56,19 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     public Glow glow;
     [ColorUsage(false, true, 0f, 8f, 0.125f, 3f)] public Color hurtGlow;
     private bool alive = true;
+    private bool freeze = false;
+
+    public void Freeze()
+    {
+        freeze = true;
+        animator.SetBool("Walking", false);
+        characterPhysics.velocity = Vector3.zero;
+    }
+
+    public void Unfreeze()
+    {
+        freeze = false;
+    }
 
     public bool Alive
     {
@@ -156,7 +169,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
 
     private void Update()
     {
-        if (alive)
+        if (alive & !freeze)
         {
             Walk();
             Jump();
@@ -364,7 +377,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
                     // Also, don't hurt ourselves
                     if (hurtable != null && colliderInAttackArea.gameObject != gameObject)
                     {
-                        hurtable.Hurt(meleeDamage, true);
+                        hurtable.Hurt(meleeDamage, true, transform);
                         didHitHurtable = true;
 
                         // Hit effects
@@ -599,10 +612,11 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
 
     public bool CanAbsorb()
     {
+        return true;
         return !mana.MaxMana;
     }
 
-    public void Hurt(float amount, bool createsMana = false)
+    public void Hurt(float amount, bool createsMana = false, Transform sender = null)
     {
         health.Hurt(amount);
         //glow.SetGlow(hurtGlow);
@@ -613,7 +627,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
         }
     }
 
-    public void Kill(bool createsMana = false)
+    public void Kill(bool createsMana = false, Transform sender = null)
     {
         Hurt(999999, createsMana);
     }

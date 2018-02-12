@@ -11,6 +11,10 @@ paladin
 
 Scripts:
 
+Unity Runtime Animation Recorder licensed by newyellow
+Avaliable on https://github.com/newyellow/Unity-Runtime-Animation-Recorder
+Not redistributed in build. Used in development.
+
 Particle effects:
 
 3D Games Effects Pack Free licensed by Creepy Cat

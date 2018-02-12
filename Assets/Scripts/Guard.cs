@@ -30,6 +30,7 @@ public class Guard : Enemy, IHurtable, IFlammable
     private ThoughtState thoughtState;
     private ThoughtState nextThoughtState;
     public enum ThoughtState { Patrol, Combat };
+    public bool oblivious = false;
 
     [Header("Patrol settings")]
     public PatrolStep[] patrolSteps;
@@ -64,6 +65,14 @@ public class Guard : Enemy, IHurtable, IFlammable
     public ManaParticle manaParticle;
     public int manaParticlesAmount;
     public float manaParticleExplosionForce;
+
+    public bool Alive
+    {
+        get
+        {
+            return alive;
+        }
+    }
 
     private void Start()
     {
@@ -234,7 +243,7 @@ public class Guard : Enemy, IHurtable, IFlammable
 
     private bool EnableCombat()
     {
-        return PlayerInActiveView() && PlayerCanBeSeen();
+        return PlayerInActiveView() && PlayerCanBeSeen() && !oblivious;
     }
 
     private bool PlayerInActiveView()
@@ -260,6 +269,11 @@ public class Guard : Enemy, IHurtable, IFlammable
         Vector3 direction = displacement.normalized;
         float distance = displacement.magnitude;
         return !Physics.Raycast(eye.position, direction, distance, opaqueLayers, QueryTriggerInteraction.Ignore);
+    }
+
+    public void StartCombat()
+    {
+        ChangeThoughtState(ThoughtState.Combat);
     }
 
     private void OnThoughtStageEnable()
@@ -312,14 +326,33 @@ public class Guard : Enemy, IHurtable, IFlammable
         }
     }
 
-    public void Hurt(float amount, bool createsMana = false)
+    public void Hurt(float amount, bool createsMana = false, Transform sender = null)
     {
         animator.SetTrigger("Impact");
         impactDurationTime = impactDuration;
         meleeDamageDelayActivated = false;
-        health.Hurt(amount);
 
-        ChangeThoughtState(ThoughtState.Combat);
+        bool stealthKill = false;
+
+        if (sender != null)
+        {
+            Vector3 displacement = sender.position - transform.position;
+            float angle = Vector3.Angle(transform.forward, displacement);
+            if (angle > 90)
+            {
+                stealthKill = true;
+            }
+        }
+
+        if (stealthKill)
+        {
+            health.Hurt(9999999);
+        }
+        else
+        {
+            health.Hurt(amount);
+            ChangeThoughtState(ThoughtState.Combat);
+        }
 
         if (health.Dead)
         {
@@ -348,10 +381,10 @@ public class Guard : Enemy, IHurtable, IFlammable
     {
         // Vision cones
         DebugExtension.DrawCone(eye.position, eye.forward, Color.red, activeViewAngle / 2);
-        DebugExtension.DrawCone(eye.position, eye.forward, Color.yellow, peripheralViewAngle / 2);
+        //DebugExtension.DrawCone(eye.position, eye.forward, Color.yellow, peripheralViewAngle / 2);
     }
 
-    public void Kill(bool createsMana = false)
+    public void Kill(bool createsMana = false, Transform sender = null)
     {
         Hurt(9999999, createsMana);
     }

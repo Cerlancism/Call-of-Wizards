@@ -10,6 +10,7 @@ public class EnemyManager : MonoBehaviour {
     {
         public Enemy enemy;
         public MetaEnemyState metaEnemyState = MetaEnemyState.Idle;
+        public bool active = true;
     }
 
     public AudioSource combatMusicBegin;
@@ -48,6 +49,11 @@ public class EnemyManager : MonoBehaviour {
         GetMetaEnemy(enemy).metaEnemyState = metaEnemyState;
     }
 
+    public void SetMetaEnemyActive(Enemy enemy, bool active)
+    {
+        GetMetaEnemy(enemy).active = active;
+    }
+
     private void Update()
     {
         // Dynamic music
@@ -56,7 +62,7 @@ public class EnemyManager : MonoBehaviour {
             bool combating = false;
             foreach (MetaEnemy metaEnemy in metaEnemies)
             {
-                if (metaEnemy.metaEnemyState == MetaEnemyState.Combat)
+                if (metaEnemy.metaEnemyState == MetaEnemyState.Combat && metaEnemy.active)
                 {
                     combating = true;
                 }
