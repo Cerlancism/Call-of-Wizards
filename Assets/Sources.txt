@@ -14,6 +14,9 @@ Scripts:
 Unity Runtime Animation Recorder licensed by newyellow
 Avaliable on https://github.com/newyellow/Unity-Runtime-Animation-Recorder
 Not redistributed in build. Used in development.
+Player Prefs Editor licensed by Sabresaurus Ltd
+Avaliable on https://assetstore.unity.com/packages/tools/playersprefs-editor-and-utilities-26656
+Not redistributed in build. Used in development.
 
 Particle effects:
 

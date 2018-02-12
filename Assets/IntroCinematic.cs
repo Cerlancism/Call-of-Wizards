@@ -7,14 +7,18 @@ public class IntroCinematic : MonoBehaviour {
     public PlayableDirector playableDirector;
     public Player player;
     public AudioSource music;
+    public CheckpointManager checkpointManager;
 
     public Behaviour[] disableDuringCinematic;
 
     public CanvasGroup blackScreen;
     public float blackScreenTime = 2;
     private float blackScreenSpeed;
+    public float blackScreenOutDelay = 2;
     public float blackScreenOutTime = 2;
     private float blackScreenOutSpeed;
+
+    public bool triggered = false;
 
     private void Start()
     {
@@ -24,8 +28,9 @@ public class IntroCinematic : MonoBehaviour {
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject == player.gameObject)
+        if (other.gameObject == player.gameObject && !triggered)
         {
+            triggered = true;
             player.Freeze();
             foreach (Behaviour behavior in disableDuringCinematic)
             {
@@ -64,6 +69,10 @@ public class IntroCinematic : MonoBehaviour {
         player.Unfreeze();
 
         // Fade out black
+        yield return new WaitForSeconds(blackScreenOutDelay);
+
+        checkpointManager.SetSpawn("Level 2");
+
         while (blackScreen.alpha > 0)
         {
             blackScreen.alpha -= blackScreenOutSpeed * Time.deltaTime;
