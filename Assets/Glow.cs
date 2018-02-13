@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Glow : MonoBehaviour {
-    public Material[] materials;
+    public SkinnedMeshRenderer[] renderers;
 
     private void Start()
     {
-        foreach (Material material in materials)
+        foreach (SkinnedMeshRenderer renderer in renderers)
         {
-            material.EnableKeyword("_EMISSION");
+            renderer.material.EnableKeyword("_EMISSION");
         }
     }
 
     public void SetGlow(Color emissionColor)
     {
-        foreach (Material material in materials)
+        foreach (SkinnedMeshRenderer renderer in renderers)
         {
-            material.SetColor("_EmissionColor", emissionColor);
+            renderer.material.SetColor("_EmissionColor", emissionColor);
         }
     }
 }

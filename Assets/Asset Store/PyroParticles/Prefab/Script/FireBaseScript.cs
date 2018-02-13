@@ -64,10 +64,11 @@ namespace DigitalRuby.PyroParticles
                 if (ManualParticleSystems == null || ManualParticleSystems.Length == 0 ||
                     System.Array.IndexOf(ManualParticleSystems, p) < 0)
                 {
-                    if (p.startDelay == 0.0f)
+                    if (p.main.startDelayMultiplier == 0.0f)
                     {
                         // wait until next frame because the transform may change
-                        p.startDelay = 0.01f;
+                        var diao = p.main;
+                        diao.startDelayMultiplier = 0.01f;
                     }
                     p.Play();
                 }

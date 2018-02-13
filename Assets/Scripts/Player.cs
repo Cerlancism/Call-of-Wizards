@@ -40,7 +40,8 @@ public class Spell
 // Walk Mode - walk (0), run (1), crouch (2)
 // Crouch = sneak
 
-public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
+public class Player : MonoBehaviour, IHurtable, IManaAbsorber
+{
     [Header("Movement")]
     public float walkingSpeed = 5;
     public float runningSpeed = 10;
@@ -55,6 +56,8 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     public Ragdoll ragdoll;
     public Glow glow;
     [ColorUsage(false, true, 0f, 8f, 0.125f, 3f)] public Color hurtGlow;
+    public float hurtGlowDuration = 0.5f;
+    private float hurtGlowTime;
     private bool alive = true;
     private bool freeze = false;
 
@@ -110,11 +113,16 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     public float meleeDamage = 10;
     public float meleeDamageDelay = 0.15f;
     public float meleeHitPauseTime = 0.1f;
+    public float meleeLockTurnSpeed = 12;
+    public float meleeLockScanRadius = 3;
     private float meleeCooldownTime;
     private float meleeStopDurationTime;
     private float meleeFistTrailDurationTime;
     private float meleeDamageDelayTime;
     private bool meleeDamageDelayActivated;
+    private Vector2 meleeLockDirection;
+    public AudioSource punchSoundSource;
+    public AudioClip[] punchSounds;
 
     [Header("Healing")]
     public float healingCooldown = 2;
@@ -123,6 +131,10 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     public float healingStopDuration = 2;
     private float healingStopDurationTime;
     private float healingCooldownTime;
+    public AudioClip healSound;
+    [ColorUsage(false, true, 0f, 8f, 0.125f, 3f)] public Color healGlow;
+    public float healGlowDuration = 0.5f;
+    private float healGlowTime;
 
     [Header("Basic Attack")]
     public BasicSpell basicSpell;
@@ -130,10 +142,13 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     public Transform basicSpellEmitPosition;
     public float basicSpellManaCost = 5;
     private float basicSpellCooldownTime;
+    public AudioSource wandSoundSource;
+    public AudioClip basicSound;
 
     [Header("Fire")]
     public Flamethrower flamethrower;
     public float fireSpellManaCost = 20; // Per second
+    public AudioSource flamethrowerSound;
 
     [Header("Zoom Crosshair")]
     public CanvasGroup crosshairCanvasGroup;
@@ -154,7 +169,8 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     public AudioSource deathMusic;
     public float deathTimeScale = 0.3f;
     public GameObject[] deathHiddenUIs;
-    public GameObject[] deathShownUIs;
+    public Image deathimage;
+    public Text deathtext;
     public bool loadingScreen = false;
 
     private void Start()
@@ -165,6 +181,10 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
         // Find original values
         originalFov = playerCamera.GetComponent<Camera>().fieldOfView;
         originalPositionalOffset = playerCamera.GetComponent<CameraOrbit>().cameraOffset;
+
+        //death image set to transparent at start
+        deathimage.canvasRenderer.SetAlpha(0.0f);
+        deathtext.enabled = false;
     }
 
     private void Update()
@@ -187,6 +207,29 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
                 SceneManager.LoadSceneAsync(loadingScreen ? "Loading" : "Game");
             }
         }
+
+        hurtGlowTime -= Time.deltaTime;
+        if (hurtGlowTime < 0) hurtGlowTime = 0;
+
+        if (healingCooldownTime <= 0) healGlowTime -= Time.deltaTime;
+        if (healGlowTime < 0) healGlowTime = 0;
+
+        Color hurtTotalGlow = hurtGlow * hurtGlowTime / hurtGlowDuration;
+        Color healTotalGlow = healGlow * healGlowTime / healGlowDuration;
+        glow.SetGlow(hurtTotalGlow + healTotalGlow);
+    }
+
+    private bool Contains(string[] array, string item)
+    {
+        bool result = false;
+        foreach (string arrayItem in array)
+        {
+            if (arrayItem == item)
+            {
+                result = true;
+            }
+        }
+        return result;
     }
 
     private void ZoomCrosshair()
@@ -194,7 +237,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
         switch (zoomCrosshairState)
         {
             case ZoomCrosshairState.Unzoomed:
-                if (Input.GetButton("Zoom Crosshair") && !ArrayUtility.Contains(crosshairDontZoomSpells, spells[currentSpell].name))
+                if (Input.GetButton("Zoom Crosshair") && !Contains(crosshairDontZoomSpells, spells[currentSpell].name))
                 {
                     zoomCrosshairState = ZoomCrosshairState.ZoomingIn;
                     crosshairZoomTime = 0;
@@ -220,7 +263,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
                 }
 
             case ZoomCrosshairState.Zoomed:
-                if (!Input.GetButton("Zoom Crosshair") || ArrayUtility.Contains(crosshairDontZoomSpells, spells[currentSpell].name))
+                if (!Input.GetButton("Zoom Crosshair") || Contains(crosshairDontZoomSpells, spells[currentSpell].name))
                 {
                     zoomCrosshairState = ZoomCrosshairState.ZoomingOut;
                     crosshairZoomTime = 0;
@@ -276,7 +319,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
         /*if (Input.GetButtonDown("Next Spell"))
         {
             currentSpell++;
-            if (currentSpell >= spells.Length)
+            if (currentSpell >= spells.Count)
             {
                 currentSpell = 0;
             }
@@ -286,7 +329,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
             currentSpell--;
             if (currentSpell < 0)
             {
-                currentSpell = spells.Length - 1;
+                currentSpell = spells.Count - 1;
             }
         }*/
 
@@ -318,7 +361,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
             }
 
             // Scrollwheel navigation
-            currentSpell += (int) Input.GetAxisRaw("Mouse ScrollWheel");
+            currentSpell += (int)Input.GetAxisRaw("Mouse ScrollWheel");
         }
 
         // Clamp spell
@@ -362,6 +405,13 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
 
         if (meleeDamageDelayActivated)
         {
+            // Lock onto hurtable
+            if (meleeLockDirection != Vector2.zero)
+            {
+                Vector3 direction3d = new Vector3(meleeLockDirection.x, 0, meleeLockDirection.y);
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction3d, Vector3.up), meleeLockTurnSpeed * Time.deltaTime);
+            }
+
             meleeDamageDelayTime -= Time.deltaTime;
             if (meleeDamageDelayTime <= 0)
             {
@@ -396,6 +446,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
                     // Hit effects
                     cameraShake.Shake(0.3f);
                     hitPause.Pause(meleeHitPauseTime);
+                    punchSoundSource.PlayOneShot(punchSounds[UnityEngine.Random.Range(0, punchSounds.Length - 1)]);
                 }
             }
         }
@@ -419,6 +470,28 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
                         // Damage after some time
                         meleeDamageDelayActivated = true;
                         meleeDamageDelayTime = meleeDamageDelay;
+
+                        // Lock onto hurtable
+                        Collider[] possibleHurtables = Physics.OverlapSphere(transform.position, meleeLockScanRadius);
+                        float shortestDistance = float.MaxValue;
+                        Transform shortestHurtable = null;
+                        foreach (Collider possibleHurtable in possibleHurtables)
+                        {
+                            float distance = (possibleHurtable.transform.position - transform.position).magnitude;
+                            if (distance < shortestDistance && possibleHurtable.gameObject != gameObject)
+                            {
+                                IHurtable hurtable = possibleHurtable.GetComponent<IHurtable>();
+                                if (hurtable != null)
+                                {
+                                    shortestHurtable = possibleHurtable.transform;
+                                }
+                            }
+                        }
+                        if (shortestHurtable != null)
+                        {
+                            Vector3 displacement = shortestHurtable.position - transform.position;
+                            meleeLockDirection = new Vector2(displacement.x, displacement.z);
+                        }
                     }
                     break;
 
@@ -434,6 +507,10 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
 
                         // Replenish health
                         health.Heal(healingHealthAmount);
+
+                        wandSoundSource.PlayOneShot(healSound);
+
+                        healGlowTime = healGlowDuration;
                     }
                     break;
 
@@ -453,6 +530,8 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
 
                         // Use up mana
                         mana.UseMana(basicSpellManaCost);
+
+                        wandSoundSource.PlayOneShot(basicSound);
                     }
                     break;
             }
@@ -476,11 +555,13 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
         {
             flamethrower.transform.LookAt(GetTargetUnderCrosshair());
             flamethrower.Play();
+            flamethrowerSound.mute = false;
             mana.UseMana(fireSpellManaCost * Time.deltaTime);
         }
         else
         {
             flamethrower.Stop();
+            flamethrowerSound.mute = true;
         }
     }
 
@@ -597,11 +678,9 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
         {
             deathHiddenUI.SetActive(false);
         }
-        foreach (GameObject deathShownUI in deathShownUIs)
-        {
-            deathShownUI.SetActive(true);
-        }
-        // Release mana
+
+        deathimage.CrossFadeAlpha(1.0f, 2f, false);
+        deathtext.enabled = true;
         manaParticleSink.enabled = false;
     }
 
@@ -619,7 +698,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber {
     public void Hurt(float amount, bool createsMana = false, Transform sender = null)
     {
         health.Hurt(amount);
-        //glow.SetGlow(hurtGlow);
+        hurtGlowTime = hurtGlowDuration;
 
         if (health.Dead)
         {

@@ -85,7 +85,32 @@ ModelImporter:
     4300024: Roof
     4300026: Base
     10800000: Lamp
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Granite
+    second: {fileID: 2100000, guid: 3e342cb9ad9015c4da8ed242651467fc, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Stonetiles
+    second: {fileID: 2100000, guid: 97fcda39969e5714591b415f3130c361, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Window
+    second: {fileID: 2100000, guid: 361c5c51ba9f6f94fb0aad7308495dc8, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Wood
+    second: {fileID: 2100000, guid: 7414490f2d239bb429cba3494f988b4e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: rooftiles
+    second: {fileID: 2100000, guid: b05dcf02b0eae074d84cc6cfe9a4a865, type: 2}
   materials:
     importMaterials: 1
     materialName: 0

@@ -40,6 +40,7 @@ public class CheckpointManager : MonoBehaviour
     public Checkpoint[] checkpoints;
     public string initialCheckpointName;
     public Player player;
+    public SpellCollected spellCollected;
 
     public string playerPrefKey = "Checkpoint";
     public string CurrentCheckpointName
@@ -66,9 +67,20 @@ public class CheckpointManager : MonoBehaviour
 
     [Header("Time Travel Fixers")]
     public IntroCinematic introCinematic;
+    public BasicTutorial basicTutorial;
+    public Teleport teleport;
+
+    [Header("Spells")]
+    public Spellbook basicSpellbook;
+    public Spellbook healingSpellbook;
+    public Spellbook fireSpellbook;
 
     private void Start()
     {
+        if (PlayButton.reset == true)
+        {
+            currentCheckpointName = null;
+        }
         Spawn();
     }
 
@@ -78,11 +90,33 @@ public class CheckpointManager : MonoBehaviour
         player.transform.position = currentCheckpoint.spawnpoint.position;
         player.transform.rotation = currentCheckpoint.spawnpoint.rotation;
 
+        // Time fixers
         switch (CurrentCheckpointName)
         {
-            case "Level 2":
             case "Level 3":
+                teleport.triggered = true;
                 introCinematic.triggered = true;
+                basicTutorial.done = true;
+                break;
+
+            case "Level 2":
+                introCinematic.triggered = true;
+                basicTutorial.done = true;
+                break;
+        }
+
+        // Spell fixers
+        switch (CurrentCheckpointName)
+        {
+            case "Level 3":
+                player.AddSpell(healingSpellbook.spell);
+                player.AddSpell(basicSpellbook.spell);
+                player.AddSpell(fireSpellbook.spell);
+                break;
+
+            case "Level 2":
+                player.AddSpell(healingSpellbook.spell);
+                player.AddSpell(basicSpellbook.spell);
                 break;
         }
     }
@@ -108,6 +142,7 @@ public class CheckpointManager : MonoBehaviour
     public void SetSpawn(string newCheckpointName)
     {
         SetSilentSpawn(newCheckpointName);
+        spellCollected.ShowMessage("Checkpoint: " + newCheckpointName);
     }
 
     public void ResetProgress()

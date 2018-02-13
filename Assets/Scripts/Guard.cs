@@ -17,6 +17,10 @@ public class Guard : Enemy, IHurtable, IFlammable
     private bool alive = true;
     private Vector3 velocity;
     public Player player;
+    public Glow glow;
+    [ColorUsage(false, true, 0f, 8f, 0.125f, 3f)] public Color hurtGlow;
+    public float hurtGlowDuration = 0.5f;
+    private float hurtGlowTime;
 
     [Header("Senses (Vision)")]
     public float activeViewAngle = 90;
@@ -24,6 +28,7 @@ public class Guard : Enemy, IHurtable, IFlammable
     public Transform eye;
     public Transform playerFocus;
     public LayerMask opaqueLayers;
+    private float longestDistance = 50;
 
     [Header("Thought")]
     public ThoughtState initialThoughtState = ThoughtState.Patrol;
@@ -196,6 +201,10 @@ public class Guard : Enemy, IHurtable, IFlammable
         }
 
         CheckThoughtStateChanged();
+
+        hurtGlowTime -= Time.deltaTime;
+        if (hurtGlowTime < 0) hurtGlowTime = 0;
+        //glow.SetGlow(hurtGlow * hurtGlowTime / hurtGlowDuration);
     }
 
     private void RecalculatePath()
@@ -268,6 +277,7 @@ public class Guard : Enemy, IHurtable, IFlammable
         Vector3 displacement = playerFocus.position - eye.position;
         Vector3 direction = displacement.normalized;
         float distance = displacement.magnitude;
+        if (distance > longestDistance) return false;
         return !Physics.Raycast(eye.position, direction, distance, opaqueLayers, QueryTriggerInteraction.Ignore);
     }
 
@@ -329,6 +339,7 @@ public class Guard : Enemy, IHurtable, IFlammable
     public void Hurt(float amount, bool createsMana = false, Transform sender = null)
     {
         animator.SetTrigger("Impact");
+        hurtGlowTime = hurtGlowDuration;
         impactDurationTime = impactDuration;
         meleeDamageDelayActivated = false;
 

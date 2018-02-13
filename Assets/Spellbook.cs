@@ -18,7 +18,7 @@ public class Spellbook : MonoBehaviour {
         if (player != null)
         {
             player.AddSpell(spell);
-            spellCollected.CollectSpell(spell);
+            spellCollected.ShowMessage(spell.displayName + " spell found!");
             Destroy(gameObject);
         }
     }

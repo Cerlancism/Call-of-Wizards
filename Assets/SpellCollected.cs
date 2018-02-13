@@ -12,29 +12,28 @@ public class SpellCollected : MonoBehaviour {
     public float appearTime = 3;
     public float disappearTime = 2;
     private float disappearSpeed;
+    private float disappearCurrentTime;
 
     private void Start()
     {
         disappearSpeed = 1 / disappearTime;
     }
 
-    public void CollectSpell(Spell spell)
+    public void ShowMessage(string message)
     {
-        text.text = spell.displayName + " spell found!";
+        text.text = message;
         audioSource.PlayOneShot(collectSound, collectSoundVolume);
         canvasGroup.alpha = 1;
 
-        StartCoroutine(DisappearAfterDelay());
+        disappearCurrentTime = disappearTime;
     }
 
-    private IEnumerator DisappearAfterDelay()
+    private void Update()
     {
-        yield return new WaitForSeconds(appearTime);
-
-        while (canvasGroup.alpha > 0)
+        disappearCurrentTime -= Time.deltaTime;
+        if (disappearCurrentTime < 0)
         {
             canvasGroup.alpha -= disappearSpeed * Time.deltaTime;
-            yield return new WaitForSeconds(0);
         }
     }
 }

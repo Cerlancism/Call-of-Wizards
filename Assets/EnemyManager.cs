@@ -51,7 +51,8 @@ public class EnemyManager : MonoBehaviour {
 
     public void SetMetaEnemyActive(Enemy enemy, bool active)
     {
-        GetMetaEnemy(enemy).active = active;
+        MetaEnemy metaEnemy = GetMetaEnemy(enemy);
+        if (metaEnemy != null) metaEnemy.active = active;
     }
 
     private void Update()
