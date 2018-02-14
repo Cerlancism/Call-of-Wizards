@@ -5,17 +5,15 @@ using UnityEngine.SceneManagement;
 
 public class PlayButton : MonoBehaviour {
     bool showLoadingScreen = true;
-    static public bool reset;
 
     public void Play()
     {
-        reset = false;
         SceneManager.LoadSceneAsync(showLoadingScreen ? "Loading" : "Game");
     }
 
     public void ResetProgress()
     {
-        reset = true;
+        PlayerPrefs.DeleteKey("Checkpoint");
         SceneManager.LoadSceneAsync(showLoadingScreen ? "Loading" : "Game");
     }
 

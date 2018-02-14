@@ -461,7 +461,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
                         animator.SetTrigger("Melee");
                         meleeStopDurationTime = meleeStopDuration;
                         meleeCooldownTime = meleeCooldown;
-                        stamina.UseStamina(meleeStaminaCost);
+                        //stamina.UseStamina(meleeStaminaCost);
 
                         // Enable trail
                         meleeFistTrail.enabled = true;

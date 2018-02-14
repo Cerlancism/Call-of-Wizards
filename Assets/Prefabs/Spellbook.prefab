@@ -93,8 +93,8 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1603670767491988}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 61.412, y: 0.862, z: 42.85}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -12.447, y: 0.5, z: 20.912}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4737560751887550}
@@ -153,7 +153,7 @@ Light:
   serializedVersion: 8
   m_Type: 2
   m_Color: {r: 0.9559838, g: 1, b: 0.5441177, a: 1}
-  m_Intensity: 5
+  m_Intensity: 10
   m_Range: 1.4
   m_SpotAngle: 30
   m_CookieSize: 10
@@ -191,9 +191,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spell:
-    name: test Spell
-    displayName: test Spell
-    icon: {fileID: 21300000, guid: 9866a92691696b346901281f2b329034, type: 3}
+    name: Healing
+    displayName: Healing
+    icon: {fileID: 21300000, guid: b83a53b5cd468c34bae9ec978a66f3ab, type: 3}
+    preview: {fileID: 4582750024160432, guid: 4e32118ac9f06b641a295e395b100920, type: 2}
+  spellCollected: {fileID: 0}
+  turnSpeed: 15
 --- !u!135 &135615400105967458
 SphereCollider:
   m_ObjectHideFlags: 1

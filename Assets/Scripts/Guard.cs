@@ -157,7 +157,16 @@ public class Guard : Enemy, IHurtable, IFlammable
 
                         // Run
                         RecalculatePath();
-                        direction = MoveOnPath();
+                        bool success, reached;
+                        direction = MoveOnPath(out success, out reached);
+
+                        // Fallback method in case of pathfinding failure AND
+                        // Walk towards player even if pathfinding is done so it can react to his movements at close range
+                        if (!success || reached)
+                        {
+                            direction = new Vector2(displacement.x, displacement.z);
+                        }
+
                         running = true;
 
                         // Fight
@@ -218,7 +227,7 @@ public class Guard : Enemy, IHurtable, IFlammable
         }
     }
 
-    private Vector2 MoveOnPath()
+    private Vector2 MoveOnPath(out bool success, out bool reached)
     {
         if (path.corners != null && path.corners.Length > 0 && path.status == NavMeshPathStatus.PathComplete)
         {
@@ -229,6 +238,8 @@ public class Guard : Enemy, IHurtable, IFlammable
                 Vector3 direction = displacement.normalized;
                 Vector2 gamepadDirection = new Vector2(direction.x, direction.z);
 
+                success = true;
+                reached = false;
                 return gamepadDirection;
             }
             else
@@ -236,17 +247,21 @@ public class Guard : Enemy, IHurtable, IFlammable
                 if (currentCorner + 1 == path.corners.Length)
                 {
                     // Reached
+                    success = true;
+                    reached = true;
                     return Vector2.zero;
                 }
                 else
                 {
                     // Next corner
                     currentCorner++;
-                    return MoveOnPath();
+                    return MoveOnPath(out success, out reached);
                 }
             }
         }
 
+        success = false;
+        reached = false;
         return Vector2.zero;
     }
 
