@@ -194,14 +194,14 @@ ModelImporter:
         functionName: OnFootstepLeft
         data: 
         objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0.5
+        floatParameter: 0.2
         intParameter: 0
         messageOptions: 0
       - time: 0.7814246
         functionName: OnFootstepRight
         data: 
         objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0.5
+        floatParameter: 0.2
         intParameter: 0
         messageOptions: 0
       transformMask: []
@@ -224,6 +224,8 @@ ModelImporter:
     optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88

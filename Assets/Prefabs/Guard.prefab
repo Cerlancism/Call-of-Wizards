@@ -622,7 +622,6 @@ GameObject:
   - component: {fileID: 114681604844244596}
   - component: {fileID: 114494695552656802}
   - component: {fileID: 114936326000279158}
-  - component: {fileID: 114831753046535260}
   m_Layer: 10
   m_Name: Guard
   m_TagString: Untagged
@@ -2749,7 +2748,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyManager: {fileID: 0}
-  speed: 2
+  speed: 1
   runningSpeed: 5
   turningSpeed: 6
   characterController: {fileID: 143041747727731926}
@@ -2769,16 +2768,15 @@ MonoBehaviour:
     m_Bits: 4294963199
   initialThoughtState: 0
   oblivious: 0
-  patrolSteps:
-  - {fileID: 114831753046535260}
+  guardPath: {fileID: 0}
   pathRecalculationInterval: 0.2
   cornerReachRadius: 0.2
   playerAttackRadius: 0.8
-  meleeCooldown: 1.133
-  meleeStopDuration: 1.133
+  meleeCooldown: 1
+  meleeStopDuration: 1
   meleeAttackArea: {fileID: 4069350869607696}
   meleeDamage: 30
-  meleeDamageDelay: 0.4
+  meleeDamageDelay: 0.35
   meleeLayerMask:
     serializedVersion: 2
     m_Bits: 4294966271
@@ -2845,18 +2843,6 @@ MonoBehaviour:
   minimumDamageSpeed: -8
   damagePerSpeed: 2
   enableFallDamage: 0
---- !u!114 &114831753046535260
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1559905585926550}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0476214da18ac4344b93fb06ba9fffb2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  duration: 1
 --- !u!114 &114936326000279158
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3255,7 +3241,7 @@ CharacterJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.0006589926, y: 0.4786487, z: -0.03480798}
+  m_ConnectedAnchor: {x: -0.00064373383, y: 0.4786487, z: -0.03480798}
   serializedVersion: 2
   m_SwingAxis: {x: 0, y: 0, z: 1}
   m_TwistLimitSpring:

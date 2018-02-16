@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BasicTutorial : MonoBehaviour {
-    public SpellCollected message;
+    public Message message;
     public bool done = false;
 
     private void Start()

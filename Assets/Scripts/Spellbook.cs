@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Spellbook : MonoBehaviour {
     public Spell spell;
-    public SpellCollected spellCollected;
+    public Message spellCollected;
     public float turnSpeed = 90;
 
     private void Update()

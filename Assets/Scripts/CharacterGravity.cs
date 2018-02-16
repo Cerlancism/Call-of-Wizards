@@ -30,13 +30,16 @@ public class CharacterGravity : MonoBehaviour {
         {
             if (characterPhysics.velocity.y < 0)
             {
-                // Fall damage
                 if (hurtable != null && enableFallDamage)
                 {
-                    if (characterPhysics.velocity.y < minimumDamageSpeed)
+                    // Fall damage
+                    float fallenHeight = (characterPhysics.velocity.y * characterPhysics.velocity.y) / (2 * -Physics.gravity.y);
+                    float fallingDamage = (fallenHeight / 2 - 1.5f) * 5; // Based on Minecraft fall damage
+                    Debug.Log("Fallen height: " + fallenHeight + " Damage: " + fallingDamage);
+
+                    if (fallingDamage > 0)
                     {
-                        float speed = -characterPhysics.velocity.y;
-                        hurtable.Hurt(speed * damagePerSpeed);
+                        hurtable.Hurt(fallingDamage);
                     }
                 }
 

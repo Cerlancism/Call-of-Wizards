@@ -5,6 +5,9 @@ using UnityEngine;
 public class BasicSpell : MonoBehaviour {
     public Vector3 direction;
     public GameObject shooter;
+    public CameraShake cameraShake;
+    public float cameraShakeAmount = 0.4f;
+    public float hitPauseTime = 0.1f;
     public float speed = 20;
     public float damage = 20;
     public float despawnTime = 10;
@@ -27,6 +30,14 @@ public class BasicSpell : MonoBehaviour {
             if (hurtable != null)
             {
                 hurtable.Hurt(damage);
+                cameraShake.Shake(cameraShakeAmount);
+
+                // Hit effects
+                HitPause otherHitPause = collider.GetComponent<HitPause>();
+                if (otherHitPause)
+                {
+                    otherHitPause.Pause(hitPauseTime);
+                }
             }
 
             Destroy(gameObject);

@@ -7,7 +7,7 @@ public class GoldenGuardTrigger : MonoBehaviour {
     public SpawnArea[] spawnAreas;
     public int numberOfGuards = 20;
     public Player target;
-    public SpellCollected message;
+    public Message message;
     public bool triggered = false;
 
     [Header("Scene References")]

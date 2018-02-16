@@ -19,6 +19,17 @@ public class CharacterPhysics : MonoBehaviour {
         // Move player based on velocity
         characterController.Move(velocity * Time.deltaTime);
 
+        // Stick to ground
+        if (velocity.y <= 0)
+        {
+            RaycastHit hit;
+            Vector3 bottom = transform.position + characterController.center + (Vector3.down * characterController.height / 2);
+            if (Physics.Raycast(bottom, Vector3.down, out hit, lenientGroundedDistance, ~0, QueryTriggerInteraction.Ignore))
+            {
+                characterController.Move(Vector3.down * hit.distance);
+            }
+        }
+
         // Slide on slides
         /*float slope = Vector3.Angle(Vector3.up, hitNormal);
         if (slope >= characterController.slopeLimit)
@@ -47,10 +58,26 @@ public class CharacterPhysics : MonoBehaviour {
     {
         get
         {
+            return GroundLenientRaycast.transform;
+        }
+    }
+
+    public float GroundLenientSlope
+    {
+        get
+        {
+            return Vector3.Angle(Vector3.up, GroundLenientRaycast.normal);
+        }
+    }
+
+    public RaycastHit GroundLenientRaycast
+    {
+        get
+        {
             RaycastHit hit;
             Vector3 bottom = transform.position + characterController.center + (Vector3.down * characterController.height / 2);
             Physics.Raycast(bottom, Vector3.down, out hit, lenientGroundedDistance, ~0, QueryTriggerInteraction.Ignore);
-            return hit.transform;
+            return hit;
         }
     }
 

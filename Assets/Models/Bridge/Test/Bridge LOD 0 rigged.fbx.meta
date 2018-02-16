@@ -1,0 +1,172 @@
+fileFormatVersion: 2
+guid: e123769fee0044645bfe0f7c8d4cd904
+timeCreated: 1518796857
+licenseType: Free
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: BridgeLeft
+    100004: BridgeRight
+    100006: Left1 Start
+    100008: Left2
+    100010: Left3
+    100012: Left4
+    100014: Left5
+    100016: Left6 End
+    100018: Left6 End_end
+    100020: lowBridgePillarsL
+    100022: lowBridgePillarsR
+    100024: lowPlanksL
+    100026: lowPlanksR
+    100028: lowRopeBottomL
+    100030: lowRopeBottomR
+    100032: lowRopeTopL
+    100034: lowRopeTopR
+    100036: Right1 Start
+    100038: Right2
+    100040: Right3
+    100042: Right4
+    100044: Right5
+    100046: Right6
+    100048: Right6_end
+    400000: //RootNode
+    400002: BridgeLeft
+    400004: BridgeRight
+    400006: Left1 Start
+    400008: Left2
+    400010: Left3
+    400012: Left4
+    400014: Left5
+    400016: Left6 End
+    400018: Left6 End_end
+    400020: lowBridgePillarsL
+    400022: lowBridgePillarsR
+    400024: lowPlanksL
+    400026: lowPlanksR
+    400028: lowRopeBottomL
+    400030: lowRopeBottomR
+    400032: lowRopeTopL
+    400034: lowRopeTopR
+    400036: Right1 Start
+    400038: Right2
+    400040: Right3
+    400042: Right4
+    400044: Right5
+    400046: Right6
+    400048: Right6_end
+    2100000: Planks
+    2100002: Rope
+    2100004: Pillars
+    4300000: lowPlanksR
+    4300002: lowRopeBottomR
+    4300004: lowBridgePillarsR
+    4300006: lowRopeTopR
+    4300008: lowPlanksL
+    4300010: lowRopeBottomL
+    4300012: lowBridgePillarsL
+    4300014: lowRopeTopL
+    9500000: //RootNode
+    13700000: lowBridgePillarsL
+    13700002: lowBridgePillarsR
+    13700004: lowPlanksL
+    13700006: lowPlanksR
+    13700008: lowRopeBottomL
+    13700010: lowRopeBottomR
+    13700012: lowRopeTopL
+    13700014: lowRopeTopR
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Pillars
+    second: {fileID: 2100000, guid: 4f88d17fe76780b4d88b16f912df8e08, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Planks
+    second: {fileID: 2100000, guid: e2132a7d4044cb84484f4d8d6141353a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Rope
+    second: {fileID: 2100000, guid: a96a267b117febe42b5f5099987d9d4d, type: 2}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 2
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

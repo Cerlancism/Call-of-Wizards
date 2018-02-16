@@ -40,7 +40,7 @@ public class Spell
 // Walk Mode - walk (0), run (1), crouch (2)
 // Crouch = sneak
 
-public class Player : MonoBehaviour, IHurtable, IManaAbsorber
+public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
 {
     [Header("Movement")]
     public float walkingSpeed = 5;
@@ -50,6 +50,8 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
     public float turningSpeed = 0.1f;
     public float runningStaminaCost = 0.1f; // Per second
     public float jumpingStaminaCost = 0.1f; // Per jump
+    //public float swimTriggerDepth = 1;
+    public float swimTargetDepth = 0.1f;
     public Transform playerCamera;
     public CharacterController characterController;
     public Animator animator;
@@ -57,9 +59,12 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
     public Glow glow;
     [ColorUsage(false, true, 0f, 8f, 0.125f, 3f)] public Color hurtGlow;
     public float hurtGlowDuration = 0.5f;
+    public float jumpSlopeLimit = 45;
     private float hurtGlowTime;
     private bool alive = true;
     private bool freeze = false;
+    private bool swimming = false;
+    private SwimmingMedium swimmingMedium;
 
     public void Freeze()
     {
@@ -150,6 +155,11 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
     public float fireSpellManaCost = 20; // Per second
     public AudioSource flamethrowerSound;
 
+    [Header("Freezing")]
+    public Flamethrower icethrower;
+    public float iceSpellManaCost = 10; // Per second
+    public AudioSource icethrowerSound;
+
     [Header("Zoom Crosshair")]
     public CanvasGroup crosshairCanvasGroup;
     public float crosshairFov = 30;
@@ -173,6 +183,31 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
     public Text deathtext;
     public bool loadingScreen = false;
 
+    [Header("Cold")]
+    public float initialCold = 0;
+    public float maxCold = 100;
+    public float coldDamageInterval = 0.5f;
+    public float coldDamagePerInterval = 5;
+    public float warmOffPerSecond = 60;
+    [ColorUsage(false, true, 0f, 8f, 0.125f, 3f)] public Color coldGlow;
+    private bool isCold = false;
+    private float coldPerSecond;
+    private float cold;
+    private float coldDamageTime;
+
+    [Header("Audiotory")]
+    private float producedAudibleRange = 0;
+    public float runningAudibleRange = 7;
+    public float walkingAudibleRange = 5;
+    public bool muted = false;
+    public float ProducedAudibleRange
+    {
+        get
+        {
+            return producedAudibleRange;
+        }
+    }
+
     private void Start()
     {
         // Setup spell bar
@@ -185,10 +220,14 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
         //death image set to transparent at start
         deathimage.canvasRenderer.SetAlpha(0.0f);
         deathtext.enabled = false;
+
+        cold = initialCold;
     }
 
     private void Update()
     {
+        producedAudibleRange = 0;
+
         if (alive & !freeze)
         {
             Walk();
@@ -208,6 +247,32 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
             }
         }
 
+        // Cold
+
+        if (isCold)
+        {
+            cold += coldPerSecond * Time.deltaTime;
+        }
+        else
+        {
+            cold -= warmOffPerSecond * Time.deltaTime;
+        }
+
+        cold = Mathf.Clamp(cold, 0, maxCold);
+
+        coldDamageTime -= Time.deltaTime;
+        if (cold >= 100)
+        {
+            if (coldDamageTime < 0)
+            {
+                // Damage
+                Hurt(coldDamagePerInterval);
+                coldDamageTime = coldDamageInterval;
+            }
+        }
+
+        // Glow
+
         hurtGlowTime -= Time.deltaTime;
         if (hurtGlowTime < 0) hurtGlowTime = 0;
 
@@ -216,7 +281,28 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
 
         Color hurtTotalGlow = hurtGlow * hurtGlowTime / hurtGlowDuration;
         Color healTotalGlow = healGlow * healGlowTime / healGlowDuration;
-        glow.SetGlow(hurtTotalGlow + healTotalGlow);
+        Color coldTotalGlow = coldGlow * cold / maxCold;
+        glow.SetGlow(hurtTotalGlow + healTotalGlow + coldTotalGlow);
+
+        // Mute
+
+        if (muted)
+        {
+            producedAudibleRange = 0;
+        }
+
+        // Swim
+
+        if (swimming)
+        {
+            characterPhysics.velocity.y = 0;
+
+            float swimTargetY = swimmingMedium.SurfaceHeight - swimTargetDepth;
+            if (transform.position.y < swimTargetY)
+            {
+                transform.position = new Vector3(transform.position.x, swimTargetY, transform.position.z);
+            }
+        }
     }
 
     private bool Contains(string[] array, string item)
@@ -377,6 +463,15 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
         spellWheel.sprite = spells[currentSpell].icon;
 
         // Put spell preview
+        if (mana.HasMana)
+        {
+            spellPreview.gameObject.SetActive(true);
+        }
+        else
+        {
+            spellPreview.gameObject.SetActive(false);
+        }
+
         if (previousSpell != currentSpell)
         {
             foreach (Transform child in spellPreview)
@@ -456,7 +551,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
             switch (spells[currentSpell].name)
             {
                 case "Melee":
-                    if (meleeCooldownTime <= 0 && stamina.HasStamina)
+                    if (meleeCooldownTime <= 0)
                     {
                         animator.SetTrigger("Melee");
                         meleeStopDurationTime = meleeStopDuration;
@@ -527,6 +622,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
                         BasicSpell newBasicSpell = Instantiate(basicSpell, originalPosition, Quaternion.identity);
                         newBasicSpell.direction = direction;
                         newBasicSpell.shooter = gameObject;
+                        newBasicSpell.cameraShake = cameraShake;
 
                         // Use up mana
                         mana.UseMana(basicSpellManaCost);
@@ -538,6 +634,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
         }
 
         bool fireOn = false;
+        bool iceOn = false;
         if (Input.GetButton("Attack"))
         {
             switch (spells[currentSpell].name)
@@ -546,6 +643,13 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
                     if (zoomCrosshairState == ZoomCrosshairState.Zoomed)
                     {
                         fireOn = true;
+                    }
+                    break;
+
+                case "Freezing":
+                    if (zoomCrosshairState == ZoomCrosshairState.Zoomed)
+                    {
+                        iceOn = true;
                     }
                     break;
             }
@@ -562,6 +666,19 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
         {
             flamethrower.Stop();
             flamethrowerSound.mute = true;
+        }
+
+        if (iceOn && mana.HasMana)
+        {
+            icethrower.transform.LookAt(GetTargetUnderCrosshair());
+            icethrower.Play();
+            icethrowerSound.mute = false;
+            mana.UseMana(iceSpellManaCost * Time.deltaTime);
+        }
+        else
+        {
+            icethrower.Stop();
+            icethrowerSound.mute = true;
         }
     }
 
@@ -633,6 +750,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
             {
                 case 1:
                     speed = runningSpeed;
+                    producedAudibleRange = runningAudibleRange;
                     stamina.UseStamina(runningStaminaCost * Time.deltaTime);
                     break;
 
@@ -642,6 +760,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
 
                 default:
                     speed = walkingSpeed;
+                    producedAudibleRange = walkingAudibleRange;
                     break;
             }
             Vector2 displacement = direction.normalized * Mathf.Clamp(inputDirection.magnitude, 0, 1) * speed;
@@ -660,10 +779,14 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
         bool jumpInput = Input.GetButtonDown("Jump");
 
         // Set velocity
-        if (jumpInput && characterPhysics.IsGroundedLenient && stamina.HasStamina && meleeStopDurationTime <= 0)
+        if (jumpInput && characterPhysics.IsGroundedLenient && meleeStopDurationTime <= 0)
         {
-            characterPhysics.velocity.y += jumpingSpeed;
-            stamina.UseStamina(jumpingStaminaCost);
+            //characterPhysics.velocity += jumpingSpeed * characterPhysics.GroundLenientRaycast.normal.normalized;
+            if (characterPhysics.GroundLenientSlope <= jumpSlopeLimit)
+            {
+                characterPhysics.velocity.y += jumpingSpeed;
+            }
+            //stamina.UseStamina(jumpingStaminaCost);
         }
     }
 
@@ -697,17 +820,52 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber
 
     public void Hurt(float amount, bool createsMana = false, Transform sender = null)
     {
-        health.Hurt(amount);
-        hurtGlowTime = hurtGlowDuration;
-
-        if (health.Dead)
+        if (!health.Dead)
         {
-            Die();
+            health.Hurt(amount);
+            hurtGlowTime = hurtGlowDuration;
+
+            if (health.Dead)
+            {
+                Die();
+            }
         }
     }
 
     public void Kill(bool createsMana = false, Transform sender = null)
     {
         Hurt(999999, createsMana);
+    }
+
+    public void EnterCold(float amount)
+    {
+        isCold = true;
+        coldPerSecond = amount;
+    }
+
+    public void ExitCold()
+    {
+        isCold = false;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        SwimmingMedium swimmingMedium = other.GetComponent<SwimmingMedium>();
+        if (swimmingMedium != null)
+        {
+            swimming = true;
+            characterGravity.enabled = false;
+            this.swimmingMedium = swimmingMedium;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        SwimmingMedium swimmingMedium = other.GetComponent<SwimmingMedium>();
+        if (swimmingMedium != null)
+        {
+            swimming = false;
+            characterGravity.enabled = true;
+        }
     }
 }

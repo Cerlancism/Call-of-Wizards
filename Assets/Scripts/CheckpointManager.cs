@@ -32,6 +32,7 @@ public class CheckpointManagerEditor : UnityEditor.Editor
 public class Checkpoint
 {
     public string name;
+    public string displayName; 
     public Transform spawnpoint;
 }
 
@@ -40,14 +41,14 @@ public class CheckpointManager : MonoBehaviour
     public Checkpoint[] checkpoints;
     public string initialCheckpointName;
     public Player player;
-    public SpellCollected spellCollected;
+    public Message spellCollected;
 
     public string playerPrefKey = "Checkpoint";
     public string CurrentCheckpointName
     {
         get
         {
-            return PlayerPrefs.GetString(playerPrefKey, initialCheckpointName);
+            return PlayerPrefs.GetString(playerPrefKey);
         }
     }
     private string currentCheckpointName
@@ -65,8 +66,16 @@ public class CheckpointManager : MonoBehaviour
         }
     }
 
+    private bool isFirstStart
+    {
+        get
+        {
+            return !PlayerPrefs.HasKey(playerPrefKey);
+        }
+    }
+
     [Header("Time Travel Fixers")]
-    public IntroCinematic introCinematic;
+    public Cinematic introCinematic;
     public BasicTutorial basicTutorial;
     public Teleport teleport;
 
@@ -75,8 +84,18 @@ public class CheckpointManager : MonoBehaviour
     public Spellbook healingSpellbook;
     public Spellbook fireSpellbook;
 
+    [Header("First Start stuff")]
+    public Cinematic startCinematic;
+
     private void Start()
     {
+        if (isFirstStart)
+        {
+            // First start, play cinematic and set first checkpoint
+            SetSilentSpawn(initialCheckpointName);
+            startCinematic.StartCinematic();
+        }
+
         Spawn();
     }
 
@@ -89,6 +108,11 @@ public class CheckpointManager : MonoBehaviour
         // Time fixers
         switch (CurrentCheckpointName)
         {
+            case "Start":
+                // Mute player for safe space to walk
+                player.muted = true;
+                break;
+
             case "Level 3":
                 teleport.triggered = true;
                 introCinematic.triggered = true;
@@ -104,6 +128,7 @@ public class CheckpointManager : MonoBehaviour
         // Spell fixers
         switch (CurrentCheckpointName)
         {
+            case "Test":
             case "Level 3":
                 player.AddSpell(healingSpellbook.spell);
                 player.AddSpell(basicSpellbook.spell);
@@ -138,7 +163,7 @@ public class CheckpointManager : MonoBehaviour
     public void SetSpawn(string newCheckpointName)
     {
         SetSilentSpawn(newCheckpointName);
-        spellCollected.ShowMessage("Checkpoint: " + newCheckpointName);
+        spellCollected.ShowMessage(GetCheckpoint(newCheckpointName).displayName);
     }
 
     public void ResetProgress()

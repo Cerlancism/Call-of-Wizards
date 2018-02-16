@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Teleport : MonoBehaviour {
-    public SpellCollected message;
+    public Message message;
     public Player target;
     public ParticleSystem effect;
     public Transform destination;

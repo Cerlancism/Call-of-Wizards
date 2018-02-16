@@ -196,6 +196,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   direction: {x: 0, y: 0, z: 0}
   shooter: {fileID: 0}
+  cameraShake: {fileID: 0}
+  cameraShakeAmount: 0.3
+  hitPauseTime: 0.1
   speed: 30
   damage: 30
   despawnTime: 10

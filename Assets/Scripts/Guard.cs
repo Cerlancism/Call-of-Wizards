@@ -34,12 +34,13 @@ public class Guard : Enemy, IHurtable, IFlammable
     public ThoughtState initialThoughtState = ThoughtState.Patrol;
     private ThoughtState thoughtState;
     private ThoughtState nextThoughtState;
-    public enum ThoughtState { Patrol, Combat };
+    public enum ThoughtState { Patrol, Alert, Combat };
     public bool oblivious = false;
 
     [Header("Patrol settings")]
-    public PatrolStep[] patrolSteps;
+    public GuardPath guardPath;
     private int currentStep;
+    private PatrolStep[] patrolSteps;
 
     [Header("Pathfinding")]
     public float pathRecalculationInterval = 1;
@@ -47,6 +48,9 @@ public class Guard : Enemy, IHurtable, IFlammable
     private NavMeshPath path;
     public float cornerReachRadius = 0.2f;
     private int currentCorner = 0;
+
+    [Header("Alert")]
+    private Vector3 alertTarget;
 
     [Header("Combat")]
     public float playerAttackRadius = 1;
@@ -83,6 +87,19 @@ public class Guard : Enemy, IHurtable, IFlammable
     {
         // IMPORTANT
         enemyManager.RegisterEnemy(this);
+
+        // Cheat so no need to redo every one
+        if (guardPath == null)
+        {
+            GuardPath temp = transform.parent.GetComponent<GuardPath>();
+            if (temp != null)
+            {
+                guardPath = temp;
+                Debug.LogWarning("Set guard path for " + transform.parent.name + "! Not recommended, it's a hack!");
+            }
+        }
+
+        patrolSteps = guardPath.patrolSteps;
 
         thoughtState = initialThoughtState;
         nextThoughtState = initialThoughtState;
@@ -147,8 +164,20 @@ public class Guard : Enemy, IHurtable, IFlammable
                         patrolStep.enabled = true;
                     }
 
+                    if (EnableAlert()) ChangeThoughtState(ThoughtState.Alert);
                     if (EnableCombat()) ChangeThoughtState(ThoughtState.Combat);
                     break;
+
+                case ThoughtState.Alert:
+                    {
+                        RecalculatePath(alertTarget);
+                        bool success, reached;
+                        direction = MoveOnPath(out success, out reached);
+
+                        if (EnableCombat()) ChangeThoughtState(ThoughtState.Combat);
+                    }
+                    break;
+
                 case ThoughtState.Combat:
                     if (player.Alive)
                     {
@@ -156,16 +185,16 @@ public class Guard : Enemy, IHurtable, IFlammable
                         float distance = displacement.magnitude;
 
                         // Run
-                        RecalculatePath();
+                        RecalculatePath(player.transform.position);
                         bool success, reached;
                         direction = MoveOnPath(out success, out reached);
 
                         // Fallback method in case of pathfinding failure AND
                         // Walk towards player even if pathfinding is done so it can react to his movements at close range
-                        if (!success || reached)
+                        /*if (!success || reached)
                         {
                             direction = new Vector2(displacement.x, displacement.z);
-                        }
+                        }*/
 
                         running = true;
 
@@ -216,12 +245,12 @@ public class Guard : Enemy, IHurtable, IFlammable
         //glow.SetGlow(hurtGlow * hurtGlowTime / hurtGlowDuration);
     }
 
-    private void RecalculatePath()
+    private void RecalculatePath(Vector3 target)
     {
         pathRecalculationTime -= Time.deltaTime;
         if (pathRecalculationTime <= 0)
         {
-            NavMesh.CalculatePath(transform.position, player.transform.position, NavMesh.AllAreas, path);
+            NavMesh.CalculatePath(transform.position, target, NavMesh.AllAreas, path);
             currentCorner = 0;
             pathRecalculationTime = pathRecalculationInterval;
         }
@@ -263,6 +292,18 @@ public class Guard : Enemy, IHurtable, IFlammable
         success = false;
         reached = false;
         return Vector2.zero;
+    }
+
+    private bool EnableAlert()
+    {
+        return CanHearPlayer() && !oblivious;
+    }
+
+    private bool CanHearPlayer()
+    {
+        Vector3 displacement = player.transform.position - transform.position;
+        float distance = displacement.magnitude;
+        return distance < player.ProducedAudibleRange;
     }
 
     private bool EnableCombat()
@@ -312,6 +353,13 @@ public class Guard : Enemy, IHurtable, IFlammable
                     patrolStep.enabled = false;
                 }
                 enemyManager.SetMetaEnemyState(this, MetaEnemyState.Idle);
+                break;
+
+            case ThoughtState.Alert:
+                Debug.Log("Who's there?");
+                alertTarget = player.transform.position;
+                path = new NavMeshPath();
+                pathRecalculationTime = 0;
                 break;
 
             case ThoughtState.Combat:
