@@ -83,6 +83,7 @@ public class CheckpointManager : MonoBehaviour
     public Spellbook basicSpellbook;
     public Spellbook healingSpellbook;
     public Spellbook fireSpellbook;
+    public Spellbook freezeSpellbook;
 
     [Header("First Start stuff")]
     public Cinematic startCinematic;
@@ -129,6 +130,12 @@ public class CheckpointManager : MonoBehaviour
         switch (CurrentCheckpointName)
         {
             case "Test":
+                player.AddSpell(healingSpellbook.spell);
+                player.AddSpell(basicSpellbook.spell);
+                player.AddSpell(fireSpellbook.spell);
+                player.AddSpell(freezeSpellbook.spell);
+                break;
+
             case "Level 3":
                 player.AddSpell(healingSpellbook.spell);
                 player.AddSpell(basicSpellbook.spell);

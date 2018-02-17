@@ -34,8 +34,8 @@ As part of legacy Standard Assets (Particles Package)
 Fire & Spell Effects licensed by Digital Ruby (Jeff Johnson)
 Avaliable on https://assetstore.unity.com/packages/vfx/particles/fire-explosions/fire-spell-effects-36825
 (Unity Asset Store License)
-Detonator Explosion Framework licensed by Ben Troop
-Avaliable on https://assetstore.unity.com/packages/vfx/particles/detonator-explosion-framework-1
+Water Fx Pack licensed by Unity Technologies
+Avaliable on https://assetstore.unity.com/packages/vfx/particles/environment/water-fx-pack-19248
 (Unity Asset Store License)
 
 Music and sound:

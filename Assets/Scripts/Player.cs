@@ -48,10 +48,14 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
     public float sneakingSpeed = 3;
     public float jumpingSpeed = 10;
     public float turningSpeed = 0.1f;
+    public float swimSpeed = 2;
+    public float fastSwimSpeed = 4;
     public float runningStaminaCost = 0.1f; // Per second
+    public float fastSwimStaminaCost = 0.1f; // Per second
     public float jumpingStaminaCost = 0.1f; // Per jump
     //public float swimTriggerDepth = 1;
     public float swimTargetDepth = 0.1f;
+    public float swimSnapTime = 0.3f;
     public Transform playerCamera;
     public CharacterController characterController;
     public Animator animator;
@@ -63,7 +67,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
     private float hurtGlowTime;
     private bool alive = true;
     private bool freeze = false;
-    private bool swimming = false;
+    private bool isSwimming = false;
     private SwimmingMedium swimmingMedium;
 
     public void Freeze()
@@ -291,18 +295,28 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
             producedAudibleRange = 0;
         }
 
-        // Swim
+        // Swim float
 
-        if (swimming)
+        if (isSwimming)
         {
             characterPhysics.velocity.y = 0;
 
+            float bottomY = transform.position.y + characterController.center.y - characterController.height / 2;
             float swimTargetY = swimmingMedium.SurfaceHeight - swimTargetDepth;
-            if (transform.position.y < swimTargetY)
+            if (bottomY < swimTargetY /*&& characterPhysics.velocity.y < 0*/)
             {
-                transform.position = new Vector3(transform.position.x, swimTargetY, transform.position.z);
+                float velocity = 0;
+                transform.position = new Vector3(transform.position.x,
+                    Mathf.SmoothDamp(transform.position.y, BottomColliderYToTransformPositionY(swimTargetY), ref velocity, swimSnapTime),
+                    transform.position.z);
             }
         }
+        animator.SetBool("Swimming", isSwimming);
+    }
+
+    private float BottomColliderYToTransformPositionY(float target)
+    {
+        return target + characterController.height / 2 - characterController.center.y;
     }
 
     private bool Contains(string[] array, string item)
@@ -551,7 +565,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
             switch (spells[currentSpell].name)
             {
                 case "Melee":
-                    if (meleeCooldownTime <= 0)
+                    if (meleeCooldownTime <= 0 && !isSwimming)
                     {
                         animator.SetTrigger("Melee");
                         meleeStopDurationTime = meleeStopDuration;
@@ -591,7 +605,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
                     break;
 
                 case "Healing":
-                    if (healingCooldownTime <= 0 && mana.HasMana)
+                    if (healingCooldownTime <= 0 && mana.HasMana && !isSwimming)
                     {
                         healingCooldownTime = healingCooldown;
                         healingStopDurationTime = healingStopDuration;
@@ -610,7 +624,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
                     break;
 
                 case "Basic":
-                    if (basicSpellCooldownTime <= 0 && mana.HasMana && zoomCrosshairState == ZoomCrosshairState.Zoomed)
+                    if (basicSpellCooldownTime <= 0 && mana.HasMana && zoomCrosshairState == ZoomCrosshairState.Zoomed && !isSwimming)
                     {
                         basicSpellCooldownTime = basicSpellCooldown;
 
@@ -640,14 +654,14 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
             switch (spells[currentSpell].name)
             {
                 case "Fire":
-                    if (zoomCrosshairState == ZoomCrosshairState.Zoomed)
+                    if (zoomCrosshairState == ZoomCrosshairState.Zoomed && !isSwimming)
                     {
                         fireOn = true;
                     }
                     break;
 
                 case "Freezing":
-                    if (zoomCrosshairState == ZoomCrosshairState.Zoomed)
+                    if (zoomCrosshairState == ZoomCrosshairState.Zoomed && !isSwimming)
                     {
                         iceOn = true;
                     }
@@ -746,22 +760,38 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
 
             // Set velocity
             float speed;
-            switch (walkMode)
+            if (isSwimming)
             {
-                case 1:
-                    speed = runningSpeed;
-                    producedAudibleRange = runningAudibleRange;
-                    stamina.UseStamina(runningStaminaCost * Time.deltaTime);
-                    break;
+                switch (walkMode) {
+                    case 1:
+                        speed = fastSwimSpeed;
+                        stamina.UseStamina(fastSwimStaminaCost * Time.deltaTime);
+                        break;
 
-                case 2:
-                    speed = sneakingSpeed;
-                    break;
+                    default:
+                        speed = swimSpeed;
+                        break;
+                }
+            }
+            else
+            {
+                switch (walkMode)
+                {
+                    case 1:
+                        speed = runningSpeed;
+                        producedAudibleRange = runningAudibleRange;
+                        stamina.UseStamina(runningStaminaCost * Time.deltaTime);
+                        break;
 
-                default:
-                    speed = walkingSpeed;
-                    producedAudibleRange = walkingAudibleRange;
-                    break;
+                    case 2:
+                        speed = sneakingSpeed;
+                        break;
+
+                    default:
+                        speed = walkingSpeed;
+                        producedAudibleRange = walkingAudibleRange;
+                        break;
+                }
             }
             Vector2 displacement = direction.normalized * Mathf.Clamp(inputDirection.magnitude, 0, 1) * speed;
             characterPhysics.velocity.x = displacement.x;
@@ -779,11 +809,16 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
         bool jumpInput = Input.GetButtonDown("Jump");
 
         // Set velocity
-        if (jumpInput && characterPhysics.IsGroundedLenient && meleeStopDurationTime <= 0)
+        if (jumpInput && (characterPhysics.IsGroundedLenient || isSwimming) && meleeStopDurationTime <= 0)
         {
             //characterPhysics.velocity += jumpingSpeed * characterPhysics.GroundLenientRaycast.normal.normalized;
-            if (characterPhysics.GroundLenientSlope <= jumpSlopeLimit)
+            if (characterPhysics.GroundLenientSlope <= jumpSlopeLimit || isSwimming)
             {
+                Debug.Log("Jump!");
+                if (isSwimming)
+                {
+                    transform.position = new Vector3(transform.position.x, BottomColliderYToTransformPositionY(swimmingMedium.SurfaceHeight + 0.3f), transform.position.z);
+                }
                 characterPhysics.velocity.y += jumpingSpeed;
             }
             //stamina.UseStamina(jumpingStaminaCost);
@@ -815,7 +850,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
     public bool CanAbsorb()
     {
         return true;
-        return !mana.MaxMana;
+        //return !mana.MaxMana;
     }
 
     public void Hurt(float amount, bool createsMana = false, Transform sender = null)
@@ -853,7 +888,8 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
         SwimmingMedium swimmingMedium = other.GetComponent<SwimmingMedium>();
         if (swimmingMedium != null)
         {
-            swimming = true;
+            Debug.Log("Start swimming");
+            isSwimming = true;
             characterGravity.enabled = false;
             this.swimmingMedium = swimmingMedium;
         }
@@ -864,7 +900,8 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
         SwimmingMedium swimmingMedium = other.GetComponent<SwimmingMedium>();
         if (swimmingMedium != null)
         {
-            swimming = false;
+            Debug.Log("Stop swimming");
+            isSwimming = false;
             characterGravity.enabled = true;
         }
     }
