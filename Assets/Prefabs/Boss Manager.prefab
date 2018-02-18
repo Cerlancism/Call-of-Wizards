@@ -239,5 +239,6 @@ MonoBehaviour:
   triggered: 0
   bossPositionOffset: {x: 20, y: 0}
   endCinematic: {fileID: 0}
+  healthGroup: {fileID: 0}
+  healthWheel: {fileID: 0}
   player: {fileID: 0}
-  healthBar: {fileID: 0}

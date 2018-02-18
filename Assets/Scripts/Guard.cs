@@ -51,6 +51,7 @@ public class Guard : Enemy, IHurtable, IFlammable
     private Vector3[] AStarPath = new Vector3[0];
     private int AStarTargetIndex;
     private bool waitingforpath = false;
+    public bool BrawlGuard = false;
 
     [Header("Alert")]
     private Vector3 alertTarget;
@@ -59,14 +60,10 @@ public class Guard : Enemy, IHurtable, IFlammable
     public float playerAttackRadius = 1;
     public float meleeCooldown = 0.2f;
     public float meleeStopDuration = 0.7f;
-    public Transform meleeAttackArea;
-    public float meleeDamage = 10;
-    public float meleeDamageDelay = 0.15f;
     private float meleeCooldownTime;
     private float meleeStopDurationTime;
-    private float meleeDamageDelayTime;
-    private bool meleeDamageDelayActivated;
-    public LayerMask meleeLayerMask;
+    public AttackArea meleeAttackArea;
+    public MeleeWeaponTrail meleeWeaponTrail;
 
     [Header("Impact")]
     public float impactDuration = 1;
@@ -120,29 +117,6 @@ public class Guard : Enemy, IHurtable, IFlammable
         {
             Vector2 direction = Vector2.zero;
             bool running = false;
-
-            if (meleeDamageDelayActivated)
-            {
-                meleeDamageDelayTime -= Time.deltaTime;
-                if (meleeDamageDelayTime <= 0)
-                {
-                    // Hurt hurtables
-                    Collider[] collidersInAttackArea = Physics.OverlapBox(meleeAttackArea.position, meleeAttackArea.localScale / 2, meleeAttackArea.rotation, meleeLayerMask);
-                    foreach (Collider colliderInAttackArea in collidersInAttackArea)
-                    {
-                        IHurtable hurtable = colliderInAttackArea.GetComponent<IHurtable>();
-
-                        // If it's hurtable
-                        // Also, don't hurt ourselves
-                        if (hurtable != null && colliderInAttackArea.gameObject != gameObject)
-                        {
-                            hurtable.Hurt(meleeDamage);
-                        }
-                    }
-
-                    meleeDamageDelayActivated = false;
-                }
-            }
 
             switch (thoughtState)
             {
@@ -206,13 +180,10 @@ public class Guard : Enemy, IHurtable, IFlammable
                         if (distance <= playerAttackRadius && meleeCooldownTime <= 0)
                         {
                             animator.SetTrigger("Melee");
+                            DisableSword();
 
                             meleeStopDurationTime = meleeStopDuration;
                             meleeCooldownTime = meleeCooldown;
-
-                            // Damage after some time
-                            meleeDamageDelayActivated = true;
-                            meleeDamageDelayTime = meleeDamageDelay;
                         }
                     }
                     break;
@@ -252,10 +223,10 @@ public class Guard : Enemy, IHurtable, IFlammable
     private void RecalculatePath(Vector3 target)
     {
         // Prison uses A Star
-        if (transform.parent.parent.name == "Prison")
+        if (transform.parent.parent.name == "Prison" && !BrawlGuard)
         {
             pathRecalculationTime -= Time.deltaTime;
-            if (pathRecalculationTime <= -0.3 && !waitingforpath)
+            if (pathRecalculationTime <= 0 && !waitingforpath)
             {
                 waitingforpath = true;
                 AStarPathRequestManager.RequestPath(transform.position, target, OnPathFound);
@@ -291,7 +262,7 @@ public class Guard : Enemy, IHurtable, IFlammable
 
     private Vector2 MoveOnPath(out bool success, out bool reached)
     {
-        if (transform.parent.parent.name == "Prison")
+        if (transform.parent.parent.name == "Prison" && !BrawlGuard)
         {
             if (AStarPath.Length > 0)
             {
@@ -312,7 +283,7 @@ public class Guard : Enemy, IHurtable, IFlammable
                         Debug.Log(transform.parent.name + " partially reached player! Distance to Player: " + (player.transform.position - transform.position).magnitude);
                         displacement = player.transform.position - transform.position;
                         distance = displacement.magnitude;
-                        if (distance > cornerReachRadius * 4)
+                        if (distance > cornerReachRadius * 2)
                         {
                             Vector3 direction = displacement.normalized;
                             Vector2 gamepadDirection = new Vector2(direction.x, direction.z);
@@ -453,6 +424,7 @@ public class Guard : Enemy, IHurtable, IFlammable
                 break;
 
             case ThoughtState.Combat:
+                Debug.Log(transform.parent.name);
                 path = new NavMeshPath();
                 pathRecalculationTime = 0; // To immediately calculate path
                 enemyManager.SetMetaEnemyState(this, MetaEnemyState.Combat);
@@ -489,22 +461,41 @@ public class Guard : Enemy, IHurtable, IFlammable
         }
     }
 
+    public void EnableSword()
+    {
+        SetSword(true);
+    }
+
+    public void DisableSword()
+    {
+        SetSword(false);
+    }
+
+    public void SetSword(bool value)
+    {
+        meleeAttackArea.active = value;
+        meleeWeaponTrail.Emit = value;
+    }
+
     public void Hurt(float amount, bool createsMana = false, Transform sender = null)
     {
         animator.SetTrigger("Impact");
         hurtGlowTime = hurtGlowDuration;
         impactDurationTime = impactDuration;
-        meleeDamageDelayActivated = false;
+        DisableSword();
 
         bool stealthKill = false;
 
-        if (sender != null)
+        if (thoughtState != ThoughtState.Combat)
         {
-            Vector3 displacement = sender.position - transform.position;
-            float angle = Vector3.Angle(transform.forward, displacement);
-            if (angle > 90)
+            if (sender != null)
             {
-                stealthKill = true;
+                Vector3 displacement = sender.position - transform.position;
+                float angle = Vector3.Angle(transform.forward, displacement);
+                if (angle > 90)
+                {
+                    stealthKill = true;
+                }
             }
         }
 

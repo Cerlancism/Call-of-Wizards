@@ -146,7 +146,7 @@ Rigidbody:
   m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 1
+  m_CollisionDetection: 2
 --- !u!108 &108713258214075220
 Light:
   m_ObjectHideFlags: 1
@@ -202,6 +202,7 @@ MonoBehaviour:
   speed: 30
   damage: 30
   despawnTime: 10
+  explosion: {fileID: 423882, guid: 3c5f4e32698bdb04eaed647f60310510, type: 2}
 --- !u!135 &135959788337291398
 SphereCollider:
   m_ObjectHideFlags: 1

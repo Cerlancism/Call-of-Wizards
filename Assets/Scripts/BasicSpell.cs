@@ -11,6 +11,7 @@ public class BasicSpell : MonoBehaviour {
     public float speed = 20;
     public float damage = 20;
     public float despawnTime = 10;
+    public Transform explosion;
 
     private void Start()
     {
@@ -30,7 +31,6 @@ public class BasicSpell : MonoBehaviour {
             if (hurtable != null)
             {
                 hurtable.Hurt(damage);
-                cameraShake.Shake(cameraShakeAmount);
 
                 // Hit effects
                 HitPause otherHitPause = collider.GetComponent<HitPause>();
@@ -40,6 +40,8 @@ public class BasicSpell : MonoBehaviour {
                 }
             }
 
+            Instantiate(explosion, transform.position, Quaternion.identity);
+            cameraShake.Shake(cameraShakeAmount);
             Destroy(gameObject);
         }
     }

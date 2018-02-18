@@ -12,17 +12,33 @@ public class Teleport : MonoBehaviour {
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject == target.gameObject && !triggered)
+        if (other.gameObject == target.gameObject)
         {
-            triggered = true;
-            StartCoroutine(DelayTeleport());
+            GameObject[] goldenGuardObjects = GameObject.FindGameObjectsWithTag("Golden Guard");
+            bool allGuardsDead = true;
+
+            foreach (GameObject goldenGuardObject in goldenGuardObjects)
+            {
+                GoldenGuard goldenGuard = goldenGuardObject.GetComponent<GoldenGuard>();
+                if (goldenGuard.Alive)
+                {
+                    allGuardsDead = false;
+                }
+            }
+
+            if (allGuardsDead)
+            {
+                StartCoroutine(DelayTeleport());
+            }
+            else
+            {
+                message.ShowMessage("Kill with fire");
+            }
         }
     }
 
     private IEnumerator DelayTeleport()
     {
-        message.ShowMessage("10s to teleport");
-        yield return new WaitForSeconds(5);
         message.ShowMessage("5s to telport");
         yield return new WaitForSeconds(5);
         target.transform.position = destination.position;

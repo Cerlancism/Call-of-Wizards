@@ -10,7 +10,6 @@ public class UImanager : MonoBehaviour {
     bool showLoadingScreen = true;
 
     public AudioMixer Master;
-
     public Canvas SettingsCanvas;
     public Canvas CreditsCanvas;
     public Slider QualitySlider;

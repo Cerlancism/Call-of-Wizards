@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -76,8 +73,11 @@ public class CheckpointManager : MonoBehaviour
 
     [Header("Time Travel Fixers")]
     public Cinematic introCinematic;
-    public BasicTutorial basicTutorial;
     public Teleport teleport;
+
+    [Header("Guard Deactivaters")]
+    public Transform level1and2GuardPositions;
+    public EnemyManager enemyManager;
 
     [Header("Spells")]
     public Spellbook basicSpellbook;
@@ -87,6 +87,7 @@ public class CheckpointManager : MonoBehaviour
 
     [Header("First Start stuff")]
     public Cinematic startCinematic;
+    public BasicTutorial basicTutorial;
 
     private void Start()
     {
@@ -94,6 +95,7 @@ public class CheckpointManager : MonoBehaviour
         {
             // First start, play cinematic and set first checkpoint
             SetSilentSpawn(initialCheckpointName);
+            basicTutorial.StartTutorial();
             startCinematic.StartCinematic();
         }
 
@@ -117,12 +119,11 @@ public class CheckpointManager : MonoBehaviour
             case "Level 3":
                 teleport.triggered = true;
                 introCinematic.triggered = true;
-                basicTutorial.done = true;
+                DeactivateGuards();
                 break;
 
             case "Level 2":
                 introCinematic.triggered = true;
-                basicTutorial.done = true;
                 break;
         }
 
@@ -165,6 +166,11 @@ public class CheckpointManager : MonoBehaviour
     public void SetSilentSpawn(string newCheckpointName)
     {
         currentCheckpointName = newCheckpointName;
+
+        if (newCheckpointName == "Level 3")
+        {
+            DeactivateGuards();
+        }
     }
 
     public void SetSpawn(string newCheckpointName)
@@ -176,5 +182,19 @@ public class CheckpointManager : MonoBehaviour
     public void ResetProgress()
     {
         currentCheckpointName = null;
+    }
+
+    private void DeactivateGuards()
+    {
+        // Deactivate guards
+        Collider[] enemyColliders = Physics.OverlapBox(level1and2GuardPositions.position, level1and2GuardPositions.lossyScale / 2, level1and2GuardPositions.rotation);
+        foreach (Collider enemyCollider in enemyColliders)
+        {
+            Enemy enemy = enemyCollider.GetComponent<Enemy>();
+            if (enemy != null)
+            {
+                enemyManager.SetMetaEnemyActive(enemy, false);
+            }
+        }
     }
 }

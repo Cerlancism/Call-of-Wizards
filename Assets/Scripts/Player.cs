@@ -117,22 +117,13 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
     public float meleeCooldown = 0.2f;
     public float meleeStopDuration = 0.7f;
     public float meleeStaminaCost = 0.1f; // Per melee attack
-    public Transform meleeAttackArea;
-    public TrailRenderer meleeFistTrail;
-    public float meleeFistTrailDuration = 0.5f;
-    public float meleeDamage = 10;
-    public float meleeDamageDelay = 0.15f;
-    public float meleeHitPauseTime = 0.1f;
     public float meleeLockTurnSpeed = 12;
     public float meleeLockScanRadius = 3;
     private float meleeCooldownTime;
     private float meleeStopDurationTime;
-    private float meleeFistTrailDurationTime;
-    private float meleeDamageDelayTime;
-    private bool meleeDamageDelayActivated;
     private Vector2 meleeLockDirection;
-    public AudioSource punchSoundSource;
-    public AudioClip[] punchSounds;
+    public AttackArea meleeAttackArea;
+    public MeleeWeaponTrail meleeWeaponTrail;
 
     [Header("Healing")]
     public float healingCooldown = 2;
@@ -176,6 +167,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
     private Vector3 originalPositionalOffset;
     private enum ZoomCrosshairState { Unzoomed, ZoomingIn, Zoomed, ZoomingOut };
     private ZoomCrosshairState zoomCrosshairState = ZoomCrosshairState.Unzoomed;
+    public LayerMask crosshairTargetLayers;
 
     [Header("Crosshair")]
     public float crosshairFallbackDistanceFromCamera = 100;
@@ -250,14 +242,6 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
             {
                 SceneManager.LoadSceneAsync(loadingScreen ? "Loading" : "Game");
             }
-        }
-
-        // Melee fist trail
-
-        meleeFistTrailDurationTime -= Time.deltaTime;
-        if (meleeFistTrailDurationTime <= 0)
-        {
-            meleeFistTrail.enabled = false;
         }
 
         // Cold
@@ -509,57 +493,35 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
         }
     }
 
+    public void EnableSword()
+    {
+        SetSword(true);
+    }
+
+    public void DisableSword()
+    {
+        SetSword(false);
+    }
+
+    public void SetSword(bool value)
+    {
+        meleeAttackArea.active = value;
+        meleeWeaponTrail.Emit = value;
+    }
+
     private void Attack()
     {
         meleeCooldownTime -= Time.deltaTime;
         healingCooldownTime -= Time.deltaTime;
         basicSpellCooldownTime -= Time.deltaTime;
 
-        if (meleeDamageDelayActivated)
+        if (meleeStopDurationTime > 0)
         {
             // Lock onto hurtable
             if (meleeLockDirection != Vector2.zero)
             {
                 Vector3 direction3d = new Vector3(meleeLockDirection.x, 0, meleeLockDirection.y);
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(direction3d, Vector3.up), meleeLockTurnSpeed * Time.deltaTime);
-            }
-
-            meleeDamageDelayTime -= Time.deltaTime;
-            if (meleeDamageDelayTime <= 0)
-            {
-                bool didHitHurtable = false;
-
-                // Hurt hurtables
-                Collider[] collidersInAttackArea = Physics.OverlapBox(meleeAttackArea.position, meleeAttackArea.localScale / 2, meleeAttackArea.rotation);
-                foreach (Collider colliderInAttackArea in collidersInAttackArea)
-                {
-                    IHurtable hurtable = colliderInAttackArea.GetComponent<IHurtable>();
-
-                    // If it's hurtable
-                    // Also, don't hurt ourselves
-                    if (hurtable != null && colliderInAttackArea.gameObject != gameObject)
-                    {
-                        hurtable.Hurt(meleeDamage, true, transform);
-                        didHitHurtable = true;
-
-                        // Hit effects
-                        HitPause otherHitPause = colliderInAttackArea.GetComponent<HitPause>();
-                        if (otherHitPause)
-                        {
-                            otherHitPause.Pause(meleeHitPauseTime);
-                        }
-                    }
-                }
-
-                meleeDamageDelayActivated = false;
-
-                if (didHitHurtable)
-                {
-                    // Hit effects
-                    cameraShake.Shake(0.3f);
-                    hitPause.Pause(meleeHitPauseTime);
-                    punchSoundSource.PlayOneShot(punchSounds[UnityEngine.Random.Range(0, punchSounds.Length - 1)]);
-                }
             }
         }
 
@@ -571,22 +533,15 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
                     if (meleeCooldownTime <= 0 && !isSwimming && !spellBarActivated)
                     {
                         animator.SetTrigger("Melee");
+                        DisableSword();
                         meleeStopDurationTime = meleeStopDuration;
                         meleeCooldownTime = meleeCooldown;
                         //stamina.UseStamina(meleeStaminaCost);
 
-                        // Enable trail
-                        meleeFistTrail.enabled = true;
-                        meleeFistTrailDurationTime = meleeFistTrailDuration;
-
-                        // Damage after some time
-                        meleeDamageDelayActivated = true;
-                        meleeDamageDelayTime = meleeDamageDelay;
-
                         // Lock onto hurtable
                         Collider[] possibleHurtables = Physics.OverlapSphere(transform.position, meleeLockScanRadius);
                         float shortestDistance = float.MaxValue;
-                        Transform shortestHurtable = null;
+                        Transform closestHurtable = null;
                         foreach (Collider possibleHurtable in possibleHurtables)
                         {
                             float distance = (possibleHurtable.transform.position - transform.position).magnitude;
@@ -595,13 +550,13 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
                                 IHurtable hurtable = possibleHurtable.GetComponent<IHurtable>();
                                 if (hurtable != null)
                                 {
-                                    shortestHurtable = possibleHurtable.transform;
+                                    closestHurtable = possibleHurtable.transform;
                                 }
                             }
                         }
-                        if (shortestHurtable != null)
+                        if (closestHurtable != null)
                         {
-                            Vector3 displacement = shortestHurtable.position - transform.position;
+                            Vector3 displacement = closestHurtable.position - transform.position;
                             meleeLockDirection = new Vector2(displacement.x, displacement.z);
                         }
                     }
@@ -664,7 +619,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
                     break;
 
                 case "Freezing":
-                    if (zoomCrosshairState == ZoomCrosshairState.Zoomed && !isSwimming && !spellBarActivated)
+                    if (!spellBarActivated)
                     {
                         iceOn = true;
                     }
@@ -687,7 +642,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
 
         if (iceOn && mana.HasMana)
         {
-            icethrower.transform.LookAt(GetTargetUnderCrosshair());
+            icethrower.transform.rotation = Quaternion.LookRotation(Vector3.down);
             icethrower.Play();
             icethrowerSound.mute = false;
             mana.UseMana(iceSpellManaCost * Time.deltaTime);
@@ -704,7 +659,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
         // Get target by crosshair
         Vector3 target;
         RaycastHit hit;
-        if (Physics.Raycast(playerCamera.GetComponent<Camera>().ViewportPointToRay(new Vector2(0.5f, 0.5f)), out hit))
+        if (Physics.Raycast(playerCamera.GetComponent<Camera>().ViewportPointToRay(new Vector2(0.5f, 0.5f)), out hit, 100, crosshairTargetLayers, QueryTriggerInteraction.Ignore))
         {
             target = hit.point;
         }
@@ -769,10 +724,12 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
                     case 1:
                         speed = fastSwimSpeed;
                         stamina.UseStamina(fastSwimStaminaCost * Time.deltaTime);
+                        producedAudibleRange = runningAudibleRange;
                         break;
 
                     default:
                         speed = swimSpeed;
+                        producedAudibleRange = walkingAudibleRange;
                         break;
                 }
             }

@@ -31,10 +31,24 @@ public class RagdollClassEditor : UnityEditor.Editor
 public class Ragdoll : MonoBehaviour {
     public CharacterController characterController;
     public Animator animator;
+    public GameObject[] ignoreObjects;
 
     private void Start()
     {
         SetEnabled(false);
+    }
+
+    private bool Contains(GameObject[] array, GameObject item)
+    {
+        bool result = false;
+        foreach (GameObject arrayItem in array)
+        {
+            if (arrayItem == item)
+            {
+                result = true;
+            }
+        }
+        return result;
     }
 
     public void SetEnabled(bool enabled)
@@ -44,12 +58,18 @@ public class Ragdoll : MonoBehaviour {
 
         foreach (Rigidbody ragdollRigidbody in ragdollRigidbodies)
         {
-            ragdollRigidbody.isKinematic = !enabled;
+            if (!Contains(ignoreObjects, ragdollRigidbody.gameObject))
+            {
+                ragdollRigidbody.isKinematic = !enabled;
+            }
         }
 
         foreach (Collider ragdollCollider in ragdollColliders)
         {
-            ragdollCollider.enabled = enabled;
+            if (!Contains(ignoreObjects, ragdollCollider.gameObject))
+            {
+                ragdollCollider.enabled = enabled;
+            }
         }
 
         characterController.enabled = !enabled;

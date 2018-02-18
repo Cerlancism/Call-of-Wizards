@@ -6,6 +6,7 @@ public class Spellbook : MonoBehaviour {
     public Spell spell;
     public Message spellCollected;
     public float turnSpeed = 90;
+    public float mana = 100;
 
     private void Update()
     {
@@ -19,6 +20,7 @@ public class Spellbook : MonoBehaviour {
         {
             player.AddSpell(spell);
             spellCollected.ShowMessage(spell.displayName + " spell found!");
+            player.GetComponent<IManaAbsorber>().AbsorbMana(mana);
             Destroy(gameObject);
         }
     }

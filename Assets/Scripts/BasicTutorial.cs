@@ -4,19 +4,19 @@ using UnityEngine;
 
 public class BasicTutorial : MonoBehaviour {
     public Message message;
-    public bool done = false;
 
-    private void Start()
+    public void StartTutorial()
     {
         StartCoroutine(DelayTutorial());
     }
 
     private IEnumerator DelayTutorial()
     {
+        yield return new WaitForSeconds(10.9f);
+        message.ShowMessage("WASD move - M1 attack");
         yield return new WaitForSeconds(3);
-        if (!done)
-        {
-            message.ShowMessage("WASD move - M1 attack");
-        }
+        message.ShowMessage("CTRL - sneak");
+        yield return new WaitForSeconds(3);
+        message.ShowMessage("ESC - Pause");
     }
 }

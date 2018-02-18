@@ -7,11 +7,15 @@ public class AttackArea : MonoBehaviour {
     public bool createsMana;
     public bool backstabPossible;
     public Transform backstabSender;
-    public GameObject[] ignoreHurtables;
     public bool active;
-    public float cooldown;
-    private float cooldownTime;
     public bool destroysIce;
+    public CameraShake cameraShake;
+    public float cameraShakeAmount;
+    public HitPause hitPause;
+    public float hitPauseAmount;
+    public float otherHitPauseAmount;
+    public AudioSource hitSource;
+    public AudioClip[] hitSounds;
 
     private void Update()
     {
@@ -22,20 +26,44 @@ public class AttackArea : MonoBehaviour {
     {
         if (active)
         {
-            IHurtable hurtable = other.GetComponent<IHurtable>();
-            if (hurtable != null)
+            if (amount > 0)
             {
-                //if (!Contains(ignoreHurtables, other.gameObject))
-                //{
-                //if (cooldownTime <= 0)
-                //{
+                IHurtable hurtable = other.GetComponent<IHurtable>();
+                if (hurtable != null)
+                {
                     hurtable.Hurt(amount, createsMana, (backstabPossible) ? backstabSender : null);
-                    //cooldownTime = cooldown;
-                //}
-                //}
+
+                    // Other hit pause
+                    if (otherHitPauseAmount > 0)
+                    {
+                        HitPause otherHitPause = other.GetComponent<HitPause>();
+                        if (otherHitPause != null)
+                        {
+                            otherHitPause.Pause(otherHitPauseAmount);
+                        }
+                    }
+
+                    // Subject hit pause
+                    if (hitPauseAmount > 0)
+                    {
+                        hitPause.Pause(hitPauseAmount);
+                    }
+
+                    // Camera shake
+                    if (cameraShakeAmount > 0)
+                    {
+                        cameraShake.Shake(cameraShakeAmount);
+                    }
+
+                    // Sound
+                    if (hitSource != null)
+                    {
+                        hitSource.PlayOneShot(hitSounds[UnityEngine.Random.Range(0, hitSounds.Length)]);
+                    }
+                }
             }
 
-            IceChunk iceChunk = GetComponent<Collider>().GetComponent<IceChunk>();
+            IceChunk iceChunk = other.GetComponent<IceChunk>();
             if (iceChunk != null)
             {
                 iceChunk.DestroyIce();

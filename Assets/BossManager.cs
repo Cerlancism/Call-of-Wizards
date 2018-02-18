@@ -14,10 +14,21 @@ public class BossManager : MonoBehaviour {
     public Cinematic endCinematic;
     private BossWall bossWall;
     private Boss boss;
+    public GameObject healthGroup;
+
+    public HealthWheel healthWheel;
+
+    private bool bossHappening;
+    public bool BossHappening
+    {
+        get
+        {
+            return bossHappening;
+        }
+    }
 
     [Header("Pass to Boss")]
     public Player player;
-    public Image healthBar;
 
     public void StartBoss(Vector2 bossPosition)
     {
@@ -29,8 +40,10 @@ public class BossManager : MonoBehaviour {
             bossWall = Instantiate(bossWallPrefab, new Vector3(bossPosition.x, bossWallHeight, bossPosition.y), Quaternion.identity);
             boss = Instantiate(bossPrefab, new Vector3(bossPosition.x, bossHeight, bossPosition.y), Quaternion.identity);
             boss.player = player;
-            boss.healthBar = healthBar;
             boss.bossManager = this;
+            healthGroup.SetActive(true);
+            healthWheel.health = boss.GetComponent<Health>();
+            bossHappening = true;
         }
     }
 
@@ -38,7 +51,9 @@ public class BossManager : MonoBehaviour {
     {
         music.Stop();
         Destroy(bossWall);
+        healthGroup.SetActive(false);
         endCinematic.StartCinematic();
+        bossHappening = false;
     }
 
     private void OnTriggerEnter(Collider other)

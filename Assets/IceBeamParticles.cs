@@ -9,6 +9,8 @@ public class IceBeamParticles : MonoBehaviour {
     public float particlesPerIceChunk = 20;
     private float particlesNextIceChunk = 0;
 
+    public float iceHeight = 4.1f;
+
     private void Start()
     {
         ps = GetComponent<ParticleSystem>();
@@ -26,7 +28,7 @@ public class IceBeamParticles : MonoBehaviour {
             particlesNextIceChunk++;
             if (particlesNextIceChunk >= particlesPerIceChunk)
             {
-                Instantiate(iceChunkPrefab, p.position, Quaternion.Euler(0, Random.Range(0f, 360f), 0), null);
+                Instantiate(iceChunkPrefab, new Vector3(p.position.x, iceHeight + Random.Range(0, 0.1f), p.position.z), Quaternion.Euler(0, Random.Range(0f, 360f), 0), null);
                 particlesNextIceChunk = 0;
             }
         }

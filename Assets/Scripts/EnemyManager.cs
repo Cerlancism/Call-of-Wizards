@@ -19,6 +19,8 @@ public class EnemyManager : MonoBehaviour {
     private DynamicMusicState dynamicMusicState = DynamicMusicState.Stopped;
     private enum DynamicMusicState { Playing, Stopped };
 
+    public BossManager bossManager;
+
     private List<MetaEnemy> metaEnemies = new List<MetaEnemy>();
 
     public Player player;
@@ -58,7 +60,7 @@ public class EnemyManager : MonoBehaviour {
     private void Update()
     {
         // Dynamic music
-        if (player.Alive)
+        if (player.Alive && !bossManager.BossHappening)
         {
             bool combating = false;
             foreach (MetaEnemy metaEnemy in metaEnemies)

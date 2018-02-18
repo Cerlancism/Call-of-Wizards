@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4675894103092648}
   - component: {fileID: 33836053378307152}
   - component: {fileID: 23610077269796020}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38,7 +38,8 @@ GameObject:
   - component: {fileID: 4305253674691180}
   - component: {fileID: 114741990506268986}
   - component: {fileID: 65555388064845474}
-  m_Layer: 0
+  - component: {fileID: 114310188072198410}
+  m_Layer: 19
   m_Name: Ice Chunk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -52,7 +53,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1279470434633614}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 791.98334, y: 18.1, z: 272.4968}
+  m_LocalPosition: {x: 748.8777, y: 10.86, z: 322.9161}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4675894103092648}
@@ -86,7 +87,7 @@ MeshRenderer:
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: bf7a506e05b1b3c4f8852dea1389160e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -125,6 +126,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 6, y: 1, z: 6}
   m_Center: {x: 0, y: -0.4, z: 0}
+--- !u!114 &114310188072198410
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1279470434633614}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cc47f60808c7bc479e13f4b2433d57a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  material: Stone
 --- !u!114 &114741990506268986
 MonoBehaviour:
   m_ObjectHideFlags: 1
