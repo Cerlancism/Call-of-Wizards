@@ -1,15 +1,53 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BossManager : MonoBehaviour {
     public Boss bossPrefab;
+    public float bossHeight;
     public BossWall bossWallPrefab;
+    public float bossWallHeight;
     public AudioSource music;
+    public bool triggered = false;
+    public Vector2 bossPositionOffset;
+    public Cinematic endCinematic;
+    private BossWall bossWall;
+    private Boss boss;
+
+    [Header("Pass to Boss")]
+    public Player player;
+    public Image healthBar;
 
     public void StartBoss(Vector2 bossPosition)
     {
-        music.Play();
-        Instantiate(bossWallPrefab, new Vector3(), Quaternion.identity);
+        bossPosition += bossPositionOffset;
+        if (!triggered)
+        {
+            triggered = true;
+            music.Play();
+            bossWall = Instantiate(bossWallPrefab, new Vector3(bossPosition.x, bossWallHeight, bossPosition.y), Quaternion.identity);
+            boss = Instantiate(bossPrefab, new Vector3(bossPosition.x, bossHeight, bossPosition.y), Quaternion.identity);
+            boss.player = player;
+            boss.healthBar = healthBar;
+            boss.bossManager = this;
+        }
+    }
+
+    public void StopBoss()
+    {
+        music.Stop();
+        Destroy(bossWall);
+        endCinematic.StartCinematic();
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Player player = other.GetComponent<Player>();
+        if (player != null)
+        {
+            Vector3 position = player.transform.position;
+            StartBoss(new Vector2(position.x, position.z));
+        }
     }
 }

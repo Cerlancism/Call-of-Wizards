@@ -67,6 +67,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
     private float hurtGlowTime;
     private bool alive = true;
     private bool freeze = false;
+    public bool invincible = false;
     private bool isSwimming = false;
     private SwimmingMedium swimmingMedium;
 
@@ -249,6 +250,14 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
             {
                 SceneManager.LoadSceneAsync(loadingScreen ? "Loading" : "Game");
             }
+        }
+
+        // Melee fist trail
+
+        meleeFistTrailDurationTime -= Time.deltaTime;
+        if (meleeFistTrailDurationTime <= 0)
+        {
+            meleeFistTrail.enabled = false;
         }
 
         // Cold
@@ -506,12 +515,6 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
         healingCooldownTime -= Time.deltaTime;
         basicSpellCooldownTime -= Time.deltaTime;
 
-        meleeFistTrailDurationTime -= Time.deltaTime;
-        if (meleeFistTrailDurationTime <= 0)
-        {
-            meleeFistTrail.enabled = false;
-        }
-
         if (meleeDamageDelayActivated)
         {
             // Lock onto hurtable
@@ -565,7 +568,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
             switch (spells[currentSpell].name)
             {
                 case "Melee":
-                    if (meleeCooldownTime <= 0 && !isSwimming)
+                    if (meleeCooldownTime <= 0 && !isSwimming && !spellBarActivated)
                     {
                         animator.SetTrigger("Melee");
                         meleeStopDurationTime = meleeStopDuration;
@@ -605,7 +608,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
                     break;
 
                 case "Healing":
-                    if (healingCooldownTime <= 0 && mana.HasMana && !isSwimming)
+                    if (healingCooldownTime <= 0 && mana.HasMana && !isSwimming && !spellBarActivated)
                     {
                         healingCooldownTime = healingCooldown;
                         healingStopDurationTime = healingStopDuration;
@@ -624,7 +627,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
                     break;
 
                 case "Basic":
-                    if (basicSpellCooldownTime <= 0 && mana.HasMana && zoomCrosshairState == ZoomCrosshairState.Zoomed && !isSwimming)
+                    if (basicSpellCooldownTime <= 0 && mana.HasMana && zoomCrosshairState == ZoomCrosshairState.Zoomed && !isSwimming && !spellBarActivated)
                     {
                         basicSpellCooldownTime = basicSpellCooldown;
 
@@ -654,14 +657,14 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
             switch (spells[currentSpell].name)
             {
                 case "Fire":
-                    if (zoomCrosshairState == ZoomCrosshairState.Zoomed && !isSwimming)
+                    if (zoomCrosshairState == ZoomCrosshairState.Zoomed && !isSwimming && !spellBarActivated)
                     {
                         fireOn = true;
                     }
                     break;
 
                 case "Freezing":
-                    if (zoomCrosshairState == ZoomCrosshairState.Zoomed && !isSwimming)
+                    if (zoomCrosshairState == ZoomCrosshairState.Zoomed && !isSwimming && !spellBarActivated)
                     {
                         iceOn = true;
                     }
@@ -741,7 +744,7 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
         // Check if moving
         meleeStopDurationTime -= Time.deltaTime;
         healingStopDurationTime -= Time.deltaTime;
-        if (inputDirection == Vector2.zero || meleeStopDurationTime > 0 || healingStopDurationTime > 0)
+        if (inputDirection == Vector2.zero || meleeStopDurationTime > 0 /*|| healingStopDurationTime > 0*/)
         {
             animator.SetBool("Walking", false);
 
@@ -855,14 +858,17 @@ public class Player : MonoBehaviour, IHurtable, IManaAbsorber, IColdable
 
     public void Hurt(float amount, bool createsMana = false, Transform sender = null)
     {
-        if (!health.Dead)
+        if (!invincible)
         {
-            health.Hurt(amount);
-            hurtGlowTime = hurtGlowDuration;
-
-            if (health.Dead)
+            if (!health.Dead)
             {
-                Die();
+                health.Hurt(amount);
+                hurtGlowTime = hurtGlowDuration;
+
+                if (health.Dead)
+                {
+                    Die();
+                }
             }
         }
     }

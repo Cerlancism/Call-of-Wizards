@@ -3,6 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
+#if UNITY_EDITOR
+using UnityEditor;
+
+[CustomEditor(typeof(Cinematic))]
+public class CinematicEditor : UnityEditor.Editor
+{
+    public override void OnInspectorGUI()
+    {
+        DrawDefaultInspector();
+
+        GUILayout.Space(5);
+        GUILayout.Label("Debug Controls", EditorStyles.boldLabel);
+
+        if (GUILayout.Button("Start", EditorStyles.miniButton))
+        {
+            ((Cinematic)target).StartCinematic();
+        }
+    }
+}
+#endif
 
 public class Cinematic : MonoBehaviour {
     public PlayableDirector playableDirector;
@@ -15,6 +37,10 @@ public class Cinematic : MonoBehaviour {
     public CanvasGroup blackScreen;
     public float blackScreenTime = 2;
     private float blackScreenSpeed;
+
+    public bool enabledSceneChange = false;
+    public string destinationScene;
+
     public float blackScreenOutDelay = 2;
     public float blackScreenOutTime = 2;
     private float blackScreenOutSpeed;
@@ -53,6 +79,7 @@ public class Cinematic : MonoBehaviour {
     {
         triggered = true;
         player.Freeze();
+        player.invincible = true;
         foreach (Behaviour behavior in disableDuringCinematic)
         {
             behavior.enabled = false;
@@ -128,25 +155,33 @@ public class Cinematic : MonoBehaviour {
         // Set to black
         blackScreen.alpha = 1;
 
-        // Prepare for gameplay
-        foreach (Behaviour behavior in disableDuringCinematic)
+        if (enabledSceneChange)
         {
-            behavior.enabled = true;
+            SceneManager.LoadSceneAsync(destinationScene);
         }
-        player.Unfreeze();
-
-        // Fade out black
-        yield return new WaitForSeconds(blackScreenOutDelay);
-
-        if (enabledCheckpoint)
+        else
         {
-            checkpointManager.SetSpawn(checkpoint);
-        }
+            // Prepare for gameplay
+            foreach (Behaviour behavior in disableDuringCinematic)
+            {
+                behavior.enabled = true;
+            }
+            player.Unfreeze();
+            player.invincible = false;
 
-        while (blackScreen.alpha > 0)
-        {
-            blackScreen.alpha -= blackScreenOutSpeed * Time.deltaTime;
-            yield return new WaitForSeconds(0);
+            // Fade out black
+            yield return new WaitForSeconds(blackScreenOutDelay);
+
+            if (enabledCheckpoint)
+            {
+                checkpointManager.SetSpawn(checkpoint);
+            }
+
+            while (blackScreen.alpha > 0)
+            {
+                blackScreen.alpha -= blackScreenOutSpeed * Time.deltaTime;
+                yield return new WaitForSeconds(0);
+            }
         }
     }
 }

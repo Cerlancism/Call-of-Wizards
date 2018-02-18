@@ -37,6 +37,11 @@ Avaliable on https://assetstore.unity.com/packages/vfx/particles/fire-explosions
 Water Fx Pack licensed by Unity Technologies
 Avaliable on https://assetstore.unity.com/packages/vfx/particles/environment/water-fx-pack-19248
 (Unity Asset Store License)
+Heatwave licensed by andrewgotow
+Avaliable on https://github.com/andrewgotow/Heatwave
+Melee Weapon Trail licensed by Anomalous Underdog
+Avaliable on https://assetstore.unity.com/packages/tools/particles-effects/melee-weapon-trail-1728
+(Unity Asset Store License)
 
 Music and sound:
 

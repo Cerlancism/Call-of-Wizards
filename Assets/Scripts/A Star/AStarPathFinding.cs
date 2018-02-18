@@ -1,77 +1,84 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class AStarPathFinding : MonoBehaviour
 {
-    public Transform TestSeeker, TestTarget;
-
+    AStarPathRequestManager requestManager;
     AStarGrid grid;
 
     void Awake()
     {
+        requestManager = GetComponent<AStarPathRequestManager>();
         grid = GetComponent<AStarGrid>();
     }
 
-    void Start()
+    public void StartFindPath(Vector3 start, Vector3 end)
     {
-        
+        StartCoroutine(FindPath(start, end));
     }
 
-    void Update()
+    IEnumerator FindPath(Vector3 startPosition, Vector3 targetPosition)
     {
-        FindPath(TestSeeker.position, TestTarget.position);
-    }
+        Vector3[] wayPoints = new Vector3[0];
+        bool pathSuccess = false;
 
-    void FindPath(Vector3 startPosition, Vector3 targetPosition)
-    {
         AStarNode start = grid.NodeFromWorldPoint(startPosition);
         AStarNode target = grid.NodeFromWorldPoint(targetPosition);
 
-        Heap<AStarNode> openSet = new Heap<AStarNode>(grid.MaxSize);
-        HashSet<AStarNode> closedSet = new HashSet<AStarNode>();
-        openSet.Add(start);
-
-        while (openSet.Count > 0)
+        if (target.Walkable)
         {
-            AStarNode current = openSet.RemoveFirst();
-            closedSet.Add(current);
+            Heap<AStarNode> openSet = new Heap<AStarNode>(grid.MaxSize);
+            HashSet<AStarNode> closedSet = new HashSet<AStarNode>();
+            openSet.Add(start);
 
-            if (current == target)
+            while (openSet.Count > 0)
             {
-                RetracePath(start, target);
-                return;
-            }
+                AStarNode current = openSet.RemoveFirst();
+                closedSet.Add(current);
 
-            foreach (var neighbour in grid.GetNeighbours(current))
-            {
-                if (!neighbour.Walkable || closedSet.Contains(neighbour))
+                if (current == target)
                 {
-                    continue;
+                    pathSuccess = true;
+                    break;
                 }
 
-                int newMovementCostToNeighBour = current.GCost + GetDistance(current, neighbour);
-                if (newMovementCostToNeighBour < neighbour.GCost || !openSet.Contains(neighbour))
+                foreach (var neighbour in grid.GetNeighbours(current))
                 {
-                    neighbour.GCost = newMovementCostToNeighBour;
-                    neighbour.HCost = GetDistance(neighbour, target);
-                    neighbour.Parent = current;
-                    if (!openSet.Contains(neighbour))
+                    if (!neighbour.Walkable || closedSet.Contains(neighbour))
                     {
-                        openSet.Add(neighbour);
+                        continue;
+                    }
+
+                    int newMovementCostToNeighBour = current.GCost + GetDistance(current, neighbour);
+                    if (newMovementCostToNeighBour < neighbour.GCost || !openSet.Contains(neighbour))
+                    {
+                        neighbour.GCost = newMovementCostToNeighBour;
+                        neighbour.HCost = GetDistance(neighbour, target);
+                        neighbour.Parent = current;
+                        if (!openSet.Contains(neighbour))
+                        {
+                            openSet.Add(neighbour);
+                        }
+                        else
+                        {
+                            openSet.UpdateItem(neighbour);
+                        }
                     }
                 }
             }
         }
+        yield return null;
+        if (pathSuccess)
+        {
+            wayPoints = RetracePath(start, target);
+        }
+        requestManager.FinishProcessing(wayPoints, pathSuccess);
     }
 
-    internal void StartFindPath(Vector3 pathStart, Vector3 pathEnd)
-    {
-        throw new NotImplementedException();
-    }
-
-    void RetracePath(AStarNode start, AStarNode end)
+    Vector3[] RetracePath(AStarNode start, AStarNode end)
     {
         List<AStarNode> path = new List<AStarNode>();
         AStarNode current = end;
@@ -81,9 +88,26 @@ public class AStarPathFinding : MonoBehaviour
             path.Add(current);
             current = current.Parent;
         }
-        path.Reverse();
+        var waypoints = SimplifyPath(path);
+        Array.Reverse(waypoints);
+        return waypoints;
+    }
 
-        grid.path = path;
+    Vector3[] SimplifyPath(List<AStarNode> path)
+    {
+        var waypoints = new List<Vector3>();
+        Vector2 directionOld = Vector2.zero;
+
+        for (int i = 1; i < path.Count; i++)
+        {
+            Vector2 directionNew = new Vector2(path[i - 1].GridX - path[i].GridX, path[i - 1].GridY - path[i].GridY);
+            if (directionNew != directionOld)
+            {
+                waypoints.Add(path[i].WorldPosition);
+            }
+            directionOld = directionNew;
+        }
+        return waypoints.ToArray();
     }
 
     int GetDistance(AStarNode A, AStarNode B)

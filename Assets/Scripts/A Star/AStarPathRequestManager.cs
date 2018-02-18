@@ -5,11 +5,42 @@ using UnityEngine;
 
 public class AStarPathRequestManager : MonoBehaviour
 {
+    Queue<PathRequest> pathRequestQueue = new Queue<PathRequest>();
+    PathRequest currentPathRequest;
 
+    static AStarPathRequestManager instance;
+    AStarPathFinding pathFinding;
+
+    bool isProcessingPath;
+
+    void Awake()
+    {
+        instance = this;
+        pathFinding = GetComponent<AStarPathFinding>();
+    }
 
     public static void RequestPath(Vector3 pathStart, Vector3 pathEnd, Action<Vector3[], bool> callback)
     {
+        PathRequest newRequest = new PathRequest(pathStart, pathEnd, callback);
+        instance.pathRequestQueue.Enqueue(newRequest);
+        instance.TryProcessNext();
+    }
 
+    void TryProcessNext()
+    {
+        if (!isProcessingPath && pathRequestQueue.Count > 0)
+        {
+            isProcessingPath = true;
+            currentPathRequest = pathRequestQueue.Dequeue();
+            pathFinding.StartFindPath(currentPathRequest.PathStart, currentPathRequest.PathEnd);
+        }
+    }
+
+    public void FinishProcessing(Vector3[] path, bool success)
+    {
+        currentPathRequest.Callback(path, success);
+        isProcessingPath = false;
+        TryProcessNext();
     }
 
     struct PathRequest
@@ -22,7 +53,7 @@ public class AStarPathRequestManager : MonoBehaviour
         {
             PathStart = start;
             PathEnd = end;
-            callback =
+            Callback = callback;
         }
     }
 }

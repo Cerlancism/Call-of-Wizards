@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Fire
   - Wall
+  - AStarObstacle
   layers:
   - Default
   - TransparentFX
@@ -21,10 +22,11 @@ TagManager:
   - Projectile
   - Player
   - Ragdoll
-  - 
-  - 
-  - 
-  - 
+  - Minimap
+  - Player Attack Area
+  - Minimap terrian
+  - Boss
+  - Boss Attack Area
   - 
   - 
   - 
@@ -38,7 +40,6 @@ TagManager:
   - 
   - 
   - CloudsToy
-  - 
   m_SortingLayers:
   - name: Default
     uniqueID: 0

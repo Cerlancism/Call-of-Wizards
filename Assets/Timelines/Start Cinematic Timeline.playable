@@ -333,6 +333,21 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_GenerateMotionCurves: 1
   m_Events: []
+--- !u!114 &114027987128539146
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff10621dc47704649802c25d12712da2, type: 3}
+  m_Name: (Clone)
+  m_EditorClassIdentifier: 
+  canvasGroup:
+    exposedName: 74db337515c6aca42b9caa5e66c28373
+    defaultValue: {fileID: 0}
+  fadeMode: 1
 --- !u!114 &114175755443639714
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -354,6 +369,64 @@ MonoBehaviour:
   - m_Start: 0.01888575218617916
     m_ClipIn: 0
     m_Asset: {fileID: 114656101160034480}
+    m_UnderlyingAsset: {fileID: 114656101160034480}
+    m_Duration: 1
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 114175755443639714}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: -1
+    m_BlendOutDuration: -1
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 2
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 2
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - serializedVersion: 2
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: FadePlayableAsset
+    m_Version: 1
+  - m_Start: 3.05
+    m_ClipIn: 0
+    m_Asset: {fileID: 114389642337404660}
     m_UnderlyingAsset: {fileID: 114656101160034480}
     m_Duration: 1
     m_TimeScale: 1
@@ -438,6 +511,36 @@ MonoBehaviour:
   m_ApplyOffsets: 0
   m_AvatarMask: {fileID: 0}
   m_ApplyAvatarMask: 1
+--- !u!114 &114384617557210844
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff10621dc47704649802c25d12712da2, type: 3}
+  m_Name: (Clone)
+  m_EditorClassIdentifier: 
+  canvasGroup:
+    exposedName: 68de63aa812d27348855d179867b8f50
+    defaultValue: {fileID: 0}
+  fadeMode: 0
+--- !u!114 &114389642337404660
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff10621dc47704649802c25d12712da2, type: 3}
+  m_Name: (Clone)
+  m_EditorClassIdentifier: 
+  canvasGroup:
+    exposedName: 74db337515c6aca42b9caa5e66c28373
+    defaultValue: {fileID: 0}
+  fadeMode: 0
 --- !u!114 &114656101160034480
 MonoBehaviour:
   m_ObjectHideFlags: 1

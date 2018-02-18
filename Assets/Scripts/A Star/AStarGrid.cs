@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class AStarGrid : MonoBehaviour
 {
+    public bool DisplayGridGizmos;
+
     public string[] UnwalkableTags;
     public Vector2 GridWorldSize;
     public float NodeRadius;
@@ -93,24 +95,15 @@ public class AStarGrid : MonoBehaviour
         return neighbours;
     }
 
-    public List<AStarNode> path;
-
     void OnDrawGizmos()
     {
         Gizmos.DrawWireCube(transform.position, new Vector3(GridWorldSize.x, 1, GridWorldSize.y));
 
-        if (grid != null)
+        if (grid != null && DisplayGridGizmos)
         {
             foreach (var node in grid)
             {
                 Gizmos.color = node.Walkable ? Color.white : Color.red;
-                if (path != null)
-                {
-                    if (path.Contains(node))
-                    {
-                        Gizmos.color = Color.black;
-                    }
-                }
                 Gizmos.DrawCube(node.WorldPosition, Vector3.one * (nodeDiameter - 0.1f));
             }
         }

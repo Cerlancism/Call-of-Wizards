@@ -24,7 +24,7 @@ public class GoldenGuardTrigger : MonoBehaviour {
             // Spawn
             for (int i = 0; i < numberOfGuards; i++)
             {
-                SpawnArea randomSpawnArea = spawnAreas[Random.Range(0, spawnAreas.Length - 1)];
+                SpawnArea randomSpawnArea = spawnAreas[Random.Range(0, spawnAreas.Length)];
                 Vector3 position = randomSpawnArea.GetRandomSpawnPosition();
                 GoldenGuard guard = Instantiate(goldenGuardPrefab, position, Quaternion.identity);
 

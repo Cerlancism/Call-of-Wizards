@@ -48,6 +48,9 @@ public class Guard : Enemy, IHurtable, IFlammable
     private NavMeshPath path;
     public float cornerReachRadius = 0.2f;
     private int currentCorner = 0;
+    private Vector3[] AStarPath = new Vector3[0];
+    private int AStarTargetIndex;
+    private bool waitingforpath = false;
 
     [Header("Alert")]
     private Vector3 alertTarget;
@@ -68,6 +71,7 @@ public class Guard : Enemy, IHurtable, IFlammable
     [Header("Impact")]
     public float impactDuration = 1;
     private float impactDurationTime;
+    public GameObject enemyIcon;
 
     [Header("Mana")]
     public Transform manaParticleSpawn;
@@ -247,44 +251,130 @@ public class Guard : Enemy, IHurtable, IFlammable
 
     private void RecalculatePath(Vector3 target)
     {
-        pathRecalculationTime -= Time.deltaTime;
-        if (pathRecalculationTime <= 0)
+        // Prison uses A Star
+        if (transform.parent.parent.name == "Prison")
         {
-            NavMesh.CalculatePath(transform.position, target, NavMesh.AllAreas, path);
-            currentCorner = 0;
-            pathRecalculationTime = pathRecalculationInterval;
+            pathRecalculationTime -= Time.deltaTime;
+            if (pathRecalculationTime <= -0.3 && !waitingforpath)
+            {
+                waitingforpath = true;
+                AStarPathRequestManager.RequestPath(transform.position, target, OnPathFound);
+                pathRecalculationTime = pathRecalculationInterval;
+            }
         }
+        // Outdoor uses nav mesh
+        else
+        {
+            pathRecalculationTime -= Time.deltaTime;
+            if (pathRecalculationTime <= 0)
+            {
+                NavMesh.CalculatePath(transform.position, target, NavMesh.AllAreas, path);
+                currentCorner = 0;
+                pathRecalculationTime = pathRecalculationInterval;
+            }
+        }
+    }
+
+    private void OnPathFound(Vector3[] newPath, bool IsSuccess)
+    {
+        if (IsSuccess)
+        {
+            AStarPath = newPath;
+            AStarTargetIndex = 0;
+        }
+        else
+        {
+            Debug.Log("Path Find failed on: " + transform.parent.name);
+        }
+        waitingforpath = false;
     }
 
     private Vector2 MoveOnPath(out bool success, out bool reached)
     {
-        if (path.corners != null && path.corners.Length > 0 && path.status == NavMeshPathStatus.PathComplete)
+        if (transform.parent.parent.name == "Prison")
         {
-            Vector3 displacement = path.corners[currentCorner] - transform.position;
-            float distance = displacement.magnitude;
-            if (distance > cornerReachRadius)
+            if (AStarPath.Length > 0)
             {
-                Vector3 direction = displacement.normalized;
-                Vector2 gamepadDirection = new Vector2(direction.x, direction.z);
-
-                success = true;
-                reached = false;
-                return gamepadDirection;
-            }
-            else
-            {
-                if (currentCorner + 1 == path.corners.Length)
+                Vector3 displacement = AStarPath[AStarTargetIndex] - transform.position;
+                float distance = displacement.magnitude;
+                if (distance > cornerReachRadius * 2 && AStarTargetIndex + 1 != AStarPath.Length)
                 {
-                    // Reached
+                    Vector3 direction = displacement.normalized;
+                    Vector2 gamepadDirection = new Vector2(direction.x, direction.z);
                     success = true;
-                    reached = true;
-                    return Vector2.zero;
+                    reached = false;
+                    return gamepadDirection;
                 }
                 else
                 {
-                    // Next corner
-                    currentCorner++;
-                    return MoveOnPath(out success, out reached);
+                    if (AStarTargetIndex + 1 == AStarPath.Length)
+                    {
+                        Debug.Log(transform.parent.name + " partially reached player! Distance to Player: " + (player.transform.position - transform.position).magnitude);
+                        displacement = player.transform.position - transform.position;
+                        distance = displacement.magnitude;
+                        if (distance > cornerReachRadius * 4)
+                        {
+                            Vector3 direction = displacement.normalized;
+                            Vector2 gamepadDirection = new Vector2(direction.x, direction.z);
+                            success = true;
+                            reached = false;
+                            return gamepadDirection;
+                        }
+                        else
+                        {
+                            //Debug.Log(transform.parent.name + " reached player! Distance to Player: " + (player.transform.position - transform.position).magnitude);
+                            // Reached
+                            success = true;
+                            reached = true;
+                            return Vector2.zero;
+                        }
+                    }
+                    else
+                    {
+                        //Debug.Log("Next corner: " + transform.parent.name);
+                        // Next corner
+                        AStarTargetIndex++;
+                        return MoveOnPath(out success, out reached);
+                    }
+                }
+            }
+            else
+            {
+                success = true;
+                reached = true;
+                return Vector2.zero;
+            }
+        }
+        else
+        {
+            if (path.corners != null && path.corners.Length > 0 && path.status == NavMeshPathStatus.PathComplete)
+            {
+                Vector3 displacement = path.corners[currentCorner] - transform.position;
+                float distance = displacement.magnitude;
+                if (distance > cornerReachRadius)
+                {
+                    Vector3 direction = displacement.normalized;
+                    Vector2 gamepadDirection = new Vector2(direction.x, direction.z);
+
+                    success = true;
+                    reached = false;
+                    return gamepadDirection;
+                }
+                else
+                {
+                    if (currentCorner + 1 == path.corners.Length)
+                    {
+                        // Reached
+                        success = true;
+                        reached = true;
+                        return Vector2.zero;
+                    }
+                    else
+                    {
+                        // Next corner
+                        currentCorner++;
+                        return MoveOnPath(out success, out reached);
+                    }
                 }
             }
         }
@@ -436,6 +526,7 @@ public class Guard : Enemy, IHurtable, IFlammable
 
     private void Die(bool createsMana = false)
     {
+        enemyIcon.SetActive(false);
         enemyManager.SetMetaEnemyState(this, MetaEnemyState.Dead);
         alive = false;
 
@@ -456,6 +547,37 @@ public class Guard : Enemy, IHurtable, IFlammable
         // Vision cones
         DebugExtension.DrawCone(eye.position, eye.forward, Color.red, activeViewAngle / 2);
         //DebugExtension.DrawCone(eye.position, eye.forward, Color.yellow, peripheralViewAngle / 2);
+    }
+
+    public void OnDrawGizmos()
+    {
+        if (AStarPath != null)
+        {
+            for (int i = AStarTargetIndex; i < AStarPath.Length; i++)
+            {
+                
+                if (i == AStarPath.Length - 1 && (player.transform.position - transform.position).magnitude > 2)
+                {
+                    Gizmos.color = Color.red;
+                    Gizmos.DrawCube(AStarPath[i], Vector3.one / 2.5f);
+                }
+                else
+                {
+                    Gizmos.color = Color.white;
+                    Gizmos.DrawCube(AStarPath[i], Vector3.one / 2.5f);
+                }
+
+                Gizmos.color = alive ? Color.green : Color.red;
+                if (i == AStarTargetIndex)
+                {
+                    Gizmos.DrawLine(transform.position, AStarPath[i]);
+                }
+                else
+                {
+                    Gizmos.DrawLine(AStarPath[i - 1], AStarPath[i]);
+                }
+            }
+        }
     }
 
     public void Kill(bool createsMana = false, Transform sender = null)

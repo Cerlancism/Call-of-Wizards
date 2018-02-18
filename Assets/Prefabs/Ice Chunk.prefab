@@ -20,7 +20,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4675894103092648}
   - component: {fileID: 33836053378307152}
-  - component: {fileID: 65995633198773476}
   - component: {fileID: 23610077269796020}
   m_Layer: 0
   m_Name: Cube
@@ -38,6 +37,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4305253674691180}
   - component: {fileID: 114741990506268986}
+  - component: {fileID: 65555388064845474}
   m_Layer: 0
   m_Name: Ice Chunk
   m_TagString: Untagged
@@ -52,7 +52,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1279470434633614}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 205.27458, y: 238.79263, z: 137.21065}
+  m_LocalPosition: {x: 791.98334, y: 18.1, z: 272.4968}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4675894103092648}
@@ -113,18 +113,18 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1035719508175558}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!65 &65995633198773476
+--- !u!65 &65555388064845474
 BoxCollider:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1035719508175558}
+  m_GameObject: {fileID: 1279470434633614}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 6, y: 1, z: 6}
+  m_Center: {x: 0, y: -0.4, z: 0}
 --- !u!114 &114741990506268986
 MonoBehaviour:
   m_ObjectHideFlags: 1
